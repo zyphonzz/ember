@@ -605,7 +605,7 @@
                 <div class="filter-grid" id="filter-grid">
                     <button class="filter-btn" data-filter="all">All</button>
                     <button class="filter-btn" data-filter="util">Util</button>
-                    <button class="filter-btn" data-filter="Hacking">H3cks</button>
+                    <button class="filter-btn" data-filter="hacking">H3cks</button>
                     <button class="filter-btn active" data-filter="tv">TV</button>
                     <button class="filter-btn" data-filter="scripts">Scripts</button>
                     <button class="filter-btn" data-filter="ai">AI</button>
@@ -619,6 +619,7 @@
                     <button class="filter-btn" data-filter="networking">Networking</button>
                     <button class="filter-btn" data-filter="crypto">Crypto</button>
                     <button class="filter-btn" data-filter="gaming">Gaming</button>
+                    <button class="filter-btn" data-filter="irc">IRC</button>
                 </div>
             </div>
         </aside>
@@ -870,7 +871,7 @@ function renderCategories() {
         btn.className = 'filter-btn';
         btn.dataset.filter = category;
         btn.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
-
+ 
         if (category === 'tv') btn.classList.add('active');
 
         filterGrid.appendChild(btn);
