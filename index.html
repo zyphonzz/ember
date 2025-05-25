@@ -206,6 +206,8 @@
             padding: 20px;
             transition: all 0.3s ease;
             position: relative;
+            display: flex;             /* <- NEW */
+            flex-direction: column;    /* <- NEW */
         }
 
         .app-card:hover {
@@ -273,7 +275,7 @@
         .tag.gaming { background-color: #555; color: white; border-color: #555; }
 
         .app-actions {
-            margin-top: 15px;
+            margin-top: auto; /* <- pushes it to bottom of the flex container */
             padding-top: 15px;
             border-top: 1px solid #333;
         }
