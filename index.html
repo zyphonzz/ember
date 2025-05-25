@@ -649,375 +649,240 @@
     </div>
 
     <script>
-        // Global data storage with localStorage persistence
-        const STORAGE_KEY = 'ember_applications';
-        const CATEGORIES_KEY = 'ember_categories';
-        
-        let applications = [];
-        let categories = [];
-        let isDevLoggedIn = false;
-        const DEV_CREDENTIALS = { username: "zyphonz", password: "Cookie113!" };
+const BIN_ID = 'YOUR_BIN_ID';
+const API_KEY = 'YOUR_JSONBIN_API_KEY';
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-        // Default sample data
-        const defaultApplications = [
-            {
-                id: 1,
-                name: "Watchwave V2",
-                description: "Reliable and trusted streaming source. Usually has what you're looking for, but might not.",
-                rating: 8.5,
-                price: "$0.00",
-                link: "https://watchwave.example.com",
-                tags: ["tv", "free"]
-            },
-            {
-                id: 2,
-                name: "StreamHub Pro",
-                description: "Advanced streaming platform with premium features and high-quality content delivery.",
-                rating: 9.2,
-                price: "$4.99",
-                link: "https://streamhub.example.com",
-                tags: ["tv", "premium"]
-            },
-            {
-                id: 3,
-                name: "RetroTV",
-                description: "Classic television shows and movies from the golden age of entertainment.",
-                rating: 7.8,
-                price: "$0.00",
-                link: "https://retrotv.example.com",
-                tags: ["tv", "free"]
-            },
-            {
-                id: 4,
-                name: "NetScan Pro",
-                description: "Advanced network scanning and reconnaissance tool for security professionals.",
-                rating: 9.5,
-                price: "$29.99",
-                link: "https://netscan.example.com",
-                tags: ["hacking", "security", "networking", "premium"]
-            },
-            {
-                id: 5,
-                name: "CryptoMiner X",
-                description: "Efficient cryptocurrency mining software with GPU optimization.",
-                rating: 8.7,
-                price: "$0.00",
-                link: null,
-                tags: ["crypto", "free", "linux", "windows"]
-            },
-            {
-                id: 6,
-                name: "AI ChatBot Builder",
-                description: "Create intelligent chatbots using advanced AI models and natural language processing.",
-                rating: 9.1,
-                price: "$19.99",
-                link: "https://aichatbot.example.com",
-                tags: ["ai", "python", "web", "premium"]
+// Local cache
+let applications = [];
+let categories = [];
+let isDevLoggedIn = false;
+
+const DEV_CREDENTIALS = { username: "zyphonz", password: "Cookie113!" };
+
+// Initialize app
+document.addEventListener('DOMContentLoaded', () => {
+    fetchData();
+    setupEventListeners();
+});
+
+// Fetch from JSONBin
+async function fetchData() {
+    try {
+        const response = await fetch(JSONBIN_URL, {
+            headers: {
+                'X-Master-Key': API_KEY
             }
-        ];
-
-        const defaultCategories = [
-            "all", "util", "h3cks", "tv", "scripts", "ai", "clients", "python", 
-            "open-source", "irc", "os-tweaking", "free", "security", "networking", 
-            "crypto", "gaming"
-        ];
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            renderApplications();
-            renderCategories();
-            setupEventListeners();
-            updateAppCount();
         });
 
-        function loadData() {
-            // Load applications from localStorage or use defaults
-            const savedApps = localStorage.getItem(STORAGE_KEY);
-            if (savedApps) {
-                applications = JSON.parse(savedApps);
-            } else {
-                applications = [...defaultApplications];
-                saveData();
-            }
+        const data = await response.json();
+        applications = data.record.applications || [];
+        categories = data.record.categories || [];
+        
+        renderApplications();
+        renderCategories();
+        updateAppCount();
+    } catch (err) {
+        console.error("Failed to fetch data:", err);
+        showStatusMessage('Error loading data.');
+    }
+}
 
-            // Load categories from localStorage or use defaults
-            const savedCategories = localStorage.getItem(CATEGORIES_KEY);
-            if (savedCategories) {
-                categories = JSON.parse(savedCategories);
-            } else {
-                categories = [...defaultCategories];
-                saveCategories();
-            }
+// Save to JSONBin
+async function saveData() {
+    const data = {
+        applications,
+        categories
+    };
+
+    try {
+        await fetch(JSONBIN_URL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY
+            },
+            body: JSON.stringify(data)
+        });
+
+        showStatusMessage('Data saved globally!');
+    } catch (err) {
+        console.error("Failed to save data:", err);
+        showStatusMessage('Error saving data.');
+    }
+}
+
+function showStatusMessage(message) {
+    const statusEl = document.getElementById('status-message');
+    statusEl.textContent = message;
+    statusEl.classList.add('show');
+    setTimeout(() => {
+        statusEl.classList.remove('show');
+    }, 3000);
+}
+
+function updateAppCount() {
+    const countEl = document.getElementById('app-count');
+    if (countEl) countEl.textContent = applications.length;
+}
+
+function setupEventListeners() {
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('filter-btn')) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            filterApplications(e.target.dataset.filter);
         }
+    });
 
-        function saveData() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(applications));
-            showStatusMessage('Data saved globally!');
-        }
+    document.querySelector('.filter-input').addEventListener('input', function() {
+        searchApplications(this.value);
+    });
 
-        function saveCategories() {
-            localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
-        }
+    document.getElementById('add-app-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        addApplication();
+    });
 
-        function showStatusMessage(message) {
-            const statusEl = document.getElementById('status-message');
-            statusEl.textContent = message;
-            statusEl.classList.add('show');
-            setTimeout(() => {
-                statusEl.classList.remove('show');
-            }, 3000);
-        }
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleLogin();
+    });
+}
 
-        function updateAppCount() {
-            const countEl = document.getElementById('app-count');
-            if (countEl) {
-                countEl.textContent = applications.length;
-            }
-        }
+function renderApplications(apps = applications) {
+    const grid = document.getElementById('content-grid');
+    const resultCount = document.getElementById('result-count');
+    
+    grid.innerHTML = '';
+    resultCount.textContent = apps.length;
 
-        function setupEventListeners() {
-            // Filter buttons
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('filter-btn')) {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-                    filterApplications(e.target.dataset.filter);
-                }
-            });
+    apps.forEach(app => {
+        const card = document.createElement('div');
+        card.className = 'app-card';
+        card.innerHTML = `
+            <div class="app-title">${app.name}</div>
+            <div class="app-description">${app.description}</div>
+            <div class="app-rating">Rating: ${app.rating}/10</div>
+            <div class="app-price">Price: ${app.price}</div>
+            <div class="app-tags">
+                ${app.tags.map(tag => `<span class="tag ${tag}">${tag.toUpperCase()}</span>`).join('')}
+            </div>
+            <div class="app-actions">
+                <button class="app-link-btn" onclick="openAppLink('${app.link || '#'}', '${app.name}')" ${!app.link ? 'disabled' : ''}>
+                    ${app.link ? 'VISIT SITE' : 'NO LINK'}
+                </button>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
 
-            // Search input
-            const filterInput = document.querySelector('.filter-input');
-            filterInput.addEventListener('input', function() {
-                searchApplications(this.value);
-            });
+function renderCategories() {
+    const filterGrid = document.getElementById('filter-grid');
+    filterGrid.innerHTML = '';
 
-            // Dev panel form
-            document.getElementById('add-app-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                addApplication();
-            });
+    categories.forEach(category => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn';
+        btn.dataset.filter = category;
+        btn.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
 
-            // Login form
-            document.getElementById('login-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleLogin();
-            });
-        }
+        if (category === 'tv') btn.classList.add('active');
 
-        function renderCategories() {
-            const filterGrid = document.getElementById('filter-grid');
-            filterGrid.innerHTML = '';
-            
-            categories.forEach(category => {
-                const btn = document.createElement('button');
-                btn.className = 'filter-btn';
-                btn.dataset.filter = category;
-                btn.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
-                
-                if (category === 'tv') {
-                    btn.classList.add('active');
-                }
-                
-                filterGrid.appendChild(btn);
-            });
-        }
+        filterGrid.appendChild(btn);
+    });
+}
 
-        function renderApplications(apps = applications) {
-            const grid = document.getElementById('content-grid');
-            const resultCount = document.getElementById('result-count');
-            
-            grid.innerHTML = '';
-            resultCount.textContent = apps.length;
+function filterApplications(filter) {
+    if (filter === 'all') {
+        renderApplications();
+        return;
+    }
 
-            apps.forEach(app => {
-                const card = document.createElement('div');
-                card.className = 'app-card';
-                card.innerHTML = `
-                    <div class="app-title">${app.name}</div>
-                    <div class="app-description">${app.description}</div>
-                    <div class="app-rating">Rating: ${app.rating}/10</div>
-                    <div class="app-price">Price: ${app.price}</div>
-                    <div class="app-tags">
-                        ${app.tags.map(tag => `<span class="tag ${tag}">${tag.toUpperCase()}</span>`).join('')}
-                    </div>
-                    <div class="app-actions">
-                        <button class="app-link-btn" onclick="openAppLink('${app.link || '#'}', '${app.name}')" ${!app.link ? 'disabled' : ''}>
-                            ${app.link ? 'VISIT SITE' : 'NO LINK'}
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+    const filtered = applications.filter(app =>
+        app.tags.includes(filter) ||
+        app.name.toLowerCase().includes(filter.toLowerCase())
+    );
+    renderApplications(filtered);
+}
 
-        function filterApplications(filter) {
-            if (filter === 'all') {
-                renderApplications();
-                return;
-            }
+function searchApplications(query) {
+    if (!query.trim()) {
+        renderApplications();
+        return;
+    }
 
-            const filtered = applications.filter(app => 
-                app.tags.includes(filter) || 
-                app.name.toLowerCase().includes(filter.toLowerCase())
-            );
-            renderApplications(filtered);
-        }
+    const filtered = applications.filter(app =>
+        app.name.toLowerCase().includes(query.toLowerCase()) ||
+        app.description.toLowerCase().includes(query.toLowerCase()) ||
+        app.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
+    );
+    renderApplications(filtered);
+}
 
-        function searchApplications(query) {
-            if (!query.trim()) {
-                renderApplications();
-                return;
-            }
+function addApplication() {
+    const name = document.getElementById('app-name').value;
+    const description = document.getElementById('app-description').value;
+    const rating = parseFloat(document.getElementById('app-rating').value);
+    const price = document.getElementById('app-price').value;
+    const link = document.getElementById('app-link').value;
 
-            const filtered = applications.filter(app => 
-                app.name.toLowerCase().includes(query.toLowerCase()) ||
-                app.description.toLowerCase().includes(query.toLowerCase()) ||
-                app.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
-            );
-            renderApplications(filtered);
-        }
+    const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox input:checked'))
+        .map(checkbox => checkbox.value);
 
-        function showDevLogin() {
-            if (isDevLoggedIn) {
-                showDevPanel();
-            } else {
-                document.getElementById('login-panel').classList.add('active');
-            }
-        }
+    const newApp = {
+        id: Date.now(),
+        name,
+        description,
+        rating,
+        price,
+        link: link || null,
+        tags: selectedTags
+    };
 
-        function closeLoginPanel() {
-            document.getElementById('login-panel').classList.remove('active');
-        }
+    applications.push(newApp);
+    saveData();
+    renderApplications();
+    updateAppCount();
 
-        function handleLogin() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const messageEl = document.getElementById('login-message');
+    document.getElementById('add-app-form').reset();
+    document.querySelectorAll('.tag-checkbox input').forEach(cb => cb.checked = false);
+}
 
-            if (username === DEV_CREDENTIALS.username && password === DEV_CREDENTIALS.password) {
-                isDevLoggedIn = true;
-                messageEl.innerHTML = '<div class="success-message">Login successful!</div>';
-                setTimeout(() => {
-                    closeLoginPanel();
-                    showDevPanel();
-                }, 1000);
-            } else {
-                messageEl.innerHTML = '<div class="error-message">Invalid credentials!</div>';
-            }
-        }
+function handleLogin() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const messageEl = document.getElementById('login-message');
 
-        function showDevPanel() {
-            document.getElementById('dev-panel').classList.add('active');
-            updateAppCount();
-        }
+    if (username === DEV_CREDENTIALS.username && password === DEV_CREDENTIALS.password) {
+        isDevLoggedIn = true;
+        messageEl.innerHTML = '<div class="success-message">Login successful!</div>';
+        setTimeout(() => {
+            closeLoginPanel();
+            showDevPanel();
+        }, 1000);
+    } else {
+        messageEl.innerHTML = '<div class="error-message">Invalid credentials!</div>';
+    }
+}
 
-        function closeDevPanel() {
-            document.getElementById('dev-panel').classList.remove('active');
-        }
+function showDevPanel() {
+    document.getElementById('dev-panel').classList.add('active');
+    updateAppCount();
+}
 
-        function addApplication() {
-            const name = document.getElementById('app-name').value;
-            const description = document.getElementById('app-description').value;
-            const rating = parseFloat(document.getElementById('app-rating').value);
-            const price = document.getElementById('app-price').value;
-            const link = document.getElementById('app-link').value;
-            
-            const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox input:checked'))
-                .map(checkbox => checkbox.value);
+function closeLoginPanel() {
+    document.getElementById('login-panel').classList.remove('active');
+}
 
-            const newApp = {
-                id: Date.now(),
-                name,
-                description,
-                rating,
-                price,
-                link: link || null,
-                tags: selectedTags
-            };
+function openAppLink(url, appName) {
+    if (url && url !== '#') {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        showStatusMessage(`Opening ${appName}...`);
+    }
+}
+</script>
 
-            applications.push(newApp);
-            saveData();
-            renderApplications();
-            updateAppCount();
-            
-            // Reset form
-            document.getElementById('add-app-form').reset();
-            document.querySelectorAll('.tag-checkbox input').forEach(cb => cb.checked = false);
-            
-            showStatusMessage('Application added and saved globally!');
-        }
-
-        function addCategory() {
-            const categoryName = document.getElementById('new-category').value.trim();
-            if (!categoryName) return;
-
-            const categorySlug = categoryName.toLowerCase().replace(/\s+/g, '-');
-            
-            if (!categories.includes(categorySlug)) {
-                categories.push(categorySlug);
-                saveCategories();
-                renderCategories();
-                showStatusMessage('Category added and saved globally!');
-            } else {
-                showStatusMessage('Category already exists!');
-            }
-
-            document.getElementById('new-category').value = '';
-        }
-
-        function exportData() {
-            const exportData = {
-                applications: applications,
-                categories: categories,
-                exportDate: new Date().toISOString()
-            };
-            
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'ember_data_export.json';
-            link.click();
-            
-            showStatusMessage('Data exported successfully!');
-        }
-
-        function clearAllData() {
-            if (confirm('Are you sure you want to clear all data? This will permanently delete everything and cannot be undone.')) {
-                applications = [];
-                categories = [...defaultCategories];
-                localStorage.removeItem(STORAGE_KEY);
-                localStorage.removeItem(CATEGORIES_KEY);
-                saveCategories();
-                renderApplications();
-                renderCategories();
-                updateAppCount();
-                showStatusMessage('All data cleared!');
-            }
-        }
-
-        function loadSampleData() {
-            if (confirm('This will replace all current data with sample data. Continue?')) {
-                applications = [...defaultApplications];
-                categories = [...defaultCategories];
-                saveData();
-                saveCategories();
-                renderApplications();
-                renderCategories();
-                updateAppCount();
-                showStatusMessage('Sample data loaded and saved!');
-            }
-        }
-
-        function openAppLink(url, appName) {
-            if (url && url !== '#') {
-                // Open in new tab for security
-                window.open(url, '_blank', 'noopener,noreferrer');
-                showStatusMessage(`Opening ${appName}...`);
-            }
-        }
-    </script>
 </body>
 </html>
