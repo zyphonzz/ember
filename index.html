@@ -676,6 +676,96 @@
     </style>
 </head>
 <body>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+                <h1 style="display:inline-block;margin-left:10px;">EMBER</h1>
+                <div class="version">v0.1 indev</div>
+            </div>
+            <div class="header-right">
+                <button class="dev-login-btn" onclick="showDevLogin()">DEV PANEL</button>
+            </div>
+        </header>
+
+        <aside class="sidebar mobile-hidden" id="sidebar">
+            <!-- ...filter section as before... -->
+            <div class="filter-section">
+                <input type="text" class="filter-input" placeholder="Filter . . ." />
+                <div class="filter-grid" id="filter-grid">
+                    <button class="filter-btn" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="util">Util</button>
+                    <button class="filter-btn" data-filter="hacking">H3cks</button>
+                    <button class="filter-btn active" data-filter="tv">TV</button>
+                    <button class="filter-btn" data-filter="scripts">Scripts</button>
+                    <button class="filter-btn" data-filter="ai">AI</button>
+                    <button class="filter-btn" data-filter="clients">Clients</button>
+                    <button class="filter-btn" data-filter="python">Python</button>
+                    <button class="filter-btn" data-filter="open-source">Open Source</button>
+                    <button class="filter-btn" data-filter="irc">IRC</button>
+                    <button class="filter-btn" data-filter="os-tweaking">OS Tweaking</button>
+                    <button class="filter-btn" data-filter="free">Free</button>
+                    <button class="filter-btn" data-filter="security">Security</button>
+                    <button class="filter-btn" data-filter="networking">Networking</button>
+                    <button class="filter-btn" data-filter="crypto">Crypto</button>
+                    <button class="filter-btn" data-filter="gaming">Gaming</button>
+                    <button class="filter-btn" data-filter="irc">IRC</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- ... -->
+        </main>
+    </div>
+    <!-- ...status message, dev/login panels... -->
+
+    <script>
+    // --- Mobile sidebar logic ---
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    function openSidebar() {
+        sidebar.classList.remove('mobile-hidden');
+        sidebar.classList.add('mobile-visible');
+        sidebarBackdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+        sidebar.classList.remove('mobile-visible');
+        sidebar.classList.add('mobile-hidden');
+        sidebarBackdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    mobileMenuBtn.addEventListener('click', openSidebar);
+    sidebarBackdrop.addEventListener('click', closeSidebar);
+    // Also close sidebar if a filter is selected (on mobile)
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('filter-btn') && window.innerWidth <= 768) {
+            closeSidebar();
+        }
+    });
+
+    // ...existing JS unchanged below...
+
+    // Wait for apps to render then hide loader
+    function waitForAppsToRender() {
+        const grid = document.getElementById('content-grid');
+        const loader = document.getElementById('loading-screen');
+        const observer = new MutationObserver(() => {
+            if (grid.children.length > 0) {
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                }, 500);
+                observer.disconnect();
+            }
+        });
+        observer.observe(grid, { childList: true });
+    }
+    waitForAppsToRender();
+    </script>
     <!-- LOADING SCREEN -->
     <div id="loading-screen">
         <div class="loading-text">EMBER LOADING<span class="dots">...</span></div>
