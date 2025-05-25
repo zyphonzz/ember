@@ -502,39 +502,132 @@
             display: block;
         }
 
+        /* Hamburger menu (hidden on desktop) */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 2rem;
+            margin-left: 10px;
+            cursor: pointer;
+            z-index: 1002;
+        }
+
+        /* Sidebar drawer on mobile */
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        .sidebar.mobile-hidden {
+            transform: translateX(-110%);
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 80vw;
+            max-width: 320px;
+            z-index: 1100;
+            background: #0a0a0a;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.6);
+        }
+        .sidebar.mobile-visible {
+            transform: translateX(0);
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            width: 80vw;
+            max-width: 320px;
+            z-index: 1100;
+            background: #0a0a0a;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.6);
+        }
+        .sidebar-backdrop {
+            display: none;
+        }
+        .sidebar-backdrop.active {
+            display: block;
+            position: fixed;
+            z-index: 1099;
+            left: 0; top: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+        }
+
         @media (max-width: 768px) {
             .container {
                 grid-template-areas: 
                     "header"
-                    "sidebar"
                     "main";
                 grid-template-columns: 1fr;
-                grid-template-rows: auto auto 1fr;
+                grid-template-rows: auto 1fr;
             }
-
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-
             .sidebar {
                 border-right: none;
                 border-bottom: 2px solid #333;
+                position: fixed;
+                left: 0; top: 0; bottom: 0;
+                width: 80vw;
+                max-width: 320px;
+                height: 100vh;
+                overflow-y: auto;
+                background: #0a0a0a;
+                transform: translateX(-110%);
+                transition: transform 0.3s ease;
+                z-index: 1100;
+                box-shadow: 2px 0 12px rgba(0,0,0,0.6);
             }
-
-            .filter-grid {
-                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            .sidebar.mobile-visible {
+                transform: translateX(0);
             }
-
+            .mobile-menu-btn {
+                display: inline-block;
+            }
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0;
+            }
+            .header-left {
+                flex: 1 1 auto;
+            }
+            .main-content {
+                padding: 10px;
+            }
             .content-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
             }
+            .dev-panel-content, .login-form {
+                margin: 10px;
+                padding: 10px;
+            }
+            .app-card {
+                padding: 12px;
+            }
+            .filter-section {
+                margin-bottom: 12px;
+            }
+            .filter-input {
+                font-size: 1rem;
+                padding: 8px;
+            }
+            .filter-grid {
+                gap: 6px;
+            }
+            .btn-primary, .btn-secondary {
+                padding: 9px 16px;
+                font-size: 0.95rem;
+            }
+            .app-link-btn {
+                font-size: 1rem;
+                padding: 9px 12px;
+            }
+        }
 
-            .dev-panel-content {
-                margin: 20px;
-                padding: 20px;
-            }
+        /* Touch-friendly enhancements */
+        .app-link-btn, .filter-btn, .dev-login-btn, .btn-primary, .btn-secondary {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        input, button, textarea {
+            font-size: 1rem;
         }
 
         ::-webkit-scrollbar {
