@@ -649,81 +649,89 @@
     </div>
 
     <script>
-const BIN_ID = '6832d5068561e97a501b3c2b';
-const API_KEY = '$2a$10$rb02TGDEvWnIEkQtDBRRt.1b5bUBSd5CSdcs1iBeI2jk4Bakdr3Ju';
-const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const STORAGE_KEY = 'ember_applications';
+const CATEGORIES_KEY = 'ember_categories';
 
-// Local cache
 let applications = [];
 let categories = [];
 let isDevLoggedIn = false;
 
 const DEV_CREDENTIALS = { username: "zyphonz", password: "Cookie113!" };
 
-// Initialize app
-document.addEventListener('DOMContentLoaded', () => {
-    fetchData();
+const defaultApplications = [
+    {
+        id: 1,
+        name: "Watchwave V2",
+        description: "Reliable and trusted streaming source. Usually has what you're looking for, but might not.",
+        rating: 8.5,
+        price: "$0.00",
+        link: "https://watchwave.example.com",
+        tags: ["tv", "free"]
+    },
+    {
+        id: 2,
+        name: "StreamHub Pro",
+        description: "Advanced streaming platform with premium features and high-quality content delivery.",
+        rating: 9.2,
+        price: "$4.99",
+        link: "https://streamhub.example.com",
+        tags: ["tv", "premium"]
+    },
+    {
+        id: 3,
+        name: "RetroTV",
+        description: "Classic television shows and movies from the golden age of entertainment.",
+        rating: 7.8,
+        price: "$0.00",
+        link: "https://retrotv.example.com",
+        tags: ["tv", "free"]
+    }
+];
+
+const defaultCategories = [
+    "all", "util", "h3cks", "tv", "scripts", "ai", "clients", "python", 
+    "open-source", "irc", "os-tweaking", "free", "security", "networking", 
+    "crypto", "gaming"
+];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadData();
+    renderApplications();
+    renderCategories();
     setupEventListeners();
+    updateAppCount();
 });
 
-// Fetch from JSONBin
-async function fetchData() {
-    try {
-        const response = await fetch(JSONBIN_URL, {
-            headers: {
-                'X-Master-Key': API_KEY
-            }
-        });
-
-        const data = await response.json();
-        applications = data.record.applications || [];
-        categories = data.record.categories || [];
-        
-        renderApplications();
-        renderCategories();
-        updateAppCount();
-    } catch (err) {
-        console.error("Failed to fetch data:", err);
-        showStatusMessage('Error loading data.');
-    }
+function showDevLogin() {
+    document.getElementById('login-panel')?.classList.add('active');
 }
 
-// Save to JSONBin
-async function saveData() {
-    const data = {
-        applications,
-        categories
-    };
-
-    try {
-        await fetch(JSONBIN_URL, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': API_KEY
-            },
-            body: JSON.stringify(data)
-        });
-
-        showStatusMessage('Data saved globally!');
-    } catch (err) {
-        console.error("Failed to save data:", err);
-        showStatusMessage('Error saving data.');
-    }
+function closeLoginPanel() {
+    document.getElementById('login-panel')?.classList.remove('active');
 }
 
-function showStatusMessage(message) {
-    const statusEl = document.getElementById('status-message');
-    statusEl.textContent = message;
-    statusEl.classList.add('show');
-    setTimeout(() => {
-        statusEl.classList.remove('show');
-    }, 3000);
+function showDevPanel() {
+    document.getElementById('dev-panel')?.classList.add('active');
+    updateAppCount();
 }
 
-function updateAppCount() {
-    const countEl = document.getElementById('app-count');
-    if (countEl) countEl.textContent = applications.length;
+function loadData() {
+    const savedApps = localStorage.getItem(STORAGE_KEY);
+    applications = savedApps ? JSON.parse(savedApps) : [...defaultApplications];
+    if (!savedApps) saveData();
+
+    const savedCategories = localStorage.getItem(CATEGORIES_KEY);
+    categories = savedCategories ? JSON.parse(savedCategories) : [...defaultCategories];
+    if (!savedCategories) saveCategories();
+}
+
+function saveData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(applications));
+    showStatusMessage('Data saved locally!');
+}
+
+function saveCategories() {
+    localStorage.setItem(CATEGORIES_KEY, JSON.stringify(categories));
 }
 
 function setupEventListeners() {
@@ -750,10 +758,23 @@ function setupEventListeners() {
     });
 }
 
+function renderCategories() {
+    const filterGrid = document.getElementById('filter-grid');
+    filterGrid.innerHTML = '';
+
+    categories.forEach(category => {
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn';
+        btn.dataset.filter = category;
+        btn.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
+        if (category === 'tv') btn.classList.add('active');
+        filterGrid.appendChild(btn);
+    });
+}
+
 function renderApplications(apps = applications) {
     const grid = document.getElementById('content-grid');
     const resultCount = document.getElementById('result-count');
-    
     grid.innerHTML = '';
     resultCount.textContent = apps.length;
 
@@ -778,40 +799,20 @@ function renderApplications(apps = applications) {
     });
 }
 
-function renderCategories() {
-    const filterGrid = document.getElementById('filter-grid');
-    filterGrid.innerHTML = '';
-
-    categories.forEach(category => {
-        const btn = document.createElement('button');
-        btn.className = 'filter-btn';
-        btn.dataset.filter = category;
-        btn.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
-
-        if (category === 'tv') btn.classList.add('active');
-
-        filterGrid.appendChild(btn);
-    });
-}
-
 function filterApplications(filter) {
     if (filter === 'all') {
         renderApplications();
-        return;
+    } else {
+        const filtered = applications.filter(app =>
+            app.tags.includes(filter) ||
+            app.name.toLowerCase().includes(filter.toLowerCase())
+        );
+        renderApplications(filtered);
     }
-
-    const filtered = applications.filter(app =>
-        app.tags.includes(filter) ||
-        app.name.toLowerCase().includes(filter.toLowerCase())
-    );
-    renderApplications(filtered);
 }
 
 function searchApplications(query) {
-    if (!query.trim()) {
-        renderApplications();
-        return;
-    }
+    if (!query.trim()) return renderApplications();
 
     const filtered = applications.filter(app =>
         app.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -828,8 +829,7 @@ function addApplication() {
     const price = document.getElementById('app-price').value;
     const link = document.getElementById('app-link').value;
 
-    const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox input:checked'))
-        .map(checkbox => checkbox.value);
+    const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox input:checked')).map(cb => cb.value);
 
     const newApp = {
         id: Date.now(),
@@ -867,13 +867,16 @@ function handleLogin() {
     }
 }
 
-function showDevPanel() {
-    document.getElementById('dev-panel').classList.add('active');
-    updateAppCount();
+function updateAppCount() {
+    const countEl = document.getElementById('app-count');
+    if (countEl) countEl.textContent = applications.length;
 }
 
-function closeLoginPanel() {
-    document.getElementById('login-panel').classList.remove('active');
+function showStatusMessage(message) {
+    const statusEl = document.getElementById('status-message');
+    statusEl.textContent = message;
+    statusEl.classList.add('show');
+    setTimeout(() => statusEl.classList.remove('show'), 3000);
 }
 
 function openAppLink(url, appName) {
@@ -883,6 +886,5 @@ function openAppLink(url, appName) {
     }
 }
 </script>
-
 </body>
 </html>
