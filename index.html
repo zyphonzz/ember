@@ -827,9 +827,9 @@
         </div>
     </div>
 
-    <!-- Start: 1-Hour File Host (Drop-In Component) -->
+    <!-- 1-Hour File Host (Uguu version) -->
     <div class="app-card p-4 rounded-xl bg-[#111] text-white border border-[#333]">
-      <h2 class="text-lg font-mono mb-2">UPLOAD FILE (1 HOUR HOSTING)</h2>
+      <h2 class="text-lg font-mono mb-2">UPLOAD FILE (Expires in 24h)</h2>
       <input id="emberFileInput" type="file" class="file:bg-[#222] file:text-white file:border file:border-[#444] file:rounded px-2 py-1 mb-3 w-full font-mono" />
       <p id="emberFileStatus" class="text-sm text-green-400 font-mono"></p>
     </div>
@@ -843,18 +843,20 @@
         if (!file) return;
     
         const formData = new FormData();
-        formData.append("file", file);
-        emberStatus.textContent = "Uploading to 1-hour host...";
+        formData.append("files[]", file);
+    
+        emberStatus.textContent = "Uploading to uguu.se...";
     
         try {
-          const res = await fetch("https://file.io/?expires=1h", {
+          const res = await fetch("https://uguu.se/upload.php", {
             method: "POST",
             body: formData
           });
     
           const data = await res.json();
-          if (data.success) {
-            emberStatus.innerHTML = `✔ Uploaded: <a href="${data.link}" target="_blank" class="underline text-blue-400">${data.link}</a>`;
+          if (data.files && data.files[0] && data.files[0].url) {
+            const url = data.files[0].url;
+            emberStatus.innerHTML = `✔ Uploaded: <a href="${url}" target="_blank" class="underline text-blue-400">${url}</a>`;
           } else {
             emberStatus.textContent = "❌ Upload failed. Try again.";
           }
@@ -863,8 +865,6 @@
         }
       });
     </script>
-<!-- End: 1-Hour File Host -->
-
 
     <script>
 const BIN_ID = '6832d5068561e97a501b3c2b';
