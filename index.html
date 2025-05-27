@@ -827,6 +827,45 @@
         </div>
     </div>
 
+    <!-- Start: 1-Hour File Host (Drop-In Component) -->
+    <div class="app-card p-4 rounded-xl bg-[#111] text-white border border-[#333]">
+      <h2 class="text-lg font-mono mb-2">UPLOAD FILE (1 HOUR HOSTING)</h2>
+      <input id="emberFileInput" type="file" class="file:bg-[#222] file:text-white file:border file:border-[#444] file:rounded px-2 py-1 mb-3 w-full font-mono" />
+      <p id="emberFileStatus" class="text-sm text-green-400 font-mono"></p>
+    </div>
+    
+    <script>
+      const emberInput = document.getElementById('emberFileInput');
+      const emberStatus = document.getElementById('emberFileStatus');
+    
+      emberInput.addEventListener('change', async () => {
+        const file = emberInput.files[0];
+        if (!file) return;
+    
+        const formData = new FormData();
+        formData.append("file", file);
+        emberStatus.textContent = "Uploading to 1-hour host...";
+    
+        try {
+          const res = await fetch("https://file.io/?expires=1h", {
+            method: "POST",
+            body: formData
+          });
+    
+          const data = await res.json();
+          if (data.success) {
+            emberStatus.innerHTML = `✔ Uploaded: <a href="${data.link}" target="_blank" class="underline text-blue-400">${data.link}</a>`;
+          } else {
+            emberStatus.textContent = "❌ Upload failed. Try again.";
+          }
+        } catch (err) {
+          emberStatus.textContent = "⚠ An error occurred.";
+        }
+      });
+    </script>
+<!-- End: 1-Hour File Host -->
+
+
     <script>
 const BIN_ID = '6832d5068561e97a501b3c2b';
 const API_KEY = '$2a$10$rb02TGDEvWnIEkQtDBRRt.1b5bUBSd5CSdcs1iBeI2jk4Bakdr3Ju';
