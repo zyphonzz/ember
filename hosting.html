@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>1 Hour File Host</title>
+  <title>EMBER - awesome sauce</title>
   <style>
         * {
             margin: 0;
@@ -679,22 +679,17 @@
 <body>
 
   <div class="main-content">
-    <div class="content-grid">
-      <div class="app-card">
-        <div class="app-title">EMBER - temp file hosting</div>
-        <div class="app-description">temporary uploading stuff. videos should embed in discord, others prolly wont.</div>
-        
-        <form id="upload-form">
-          <input type="file" name="file" class="form-input" required />
-          <button type="submit" class="app-link-btn" style="margin-top: 10px;">Upload</button>
-        </form>
+    <h1 style="color: white; font-size: 2rem; margin-bottom: 20px;">1 hour temporary file hosting (embeds in discord 🤑)</h1>
 
-        <div id="link-container" style="margin-top: 15px; display: none;">
-          <video id="video-preview" controls style="width:100%; max-height: 200px; margin-bottom: 10px;"></video>
-          <input type="text" id="file-url" class="form-input" readonly />
-          <button onclick="copyLink()" class="app-link-btn" style="margin-top: 10px;">Copy Link</button>
-        </div>
-      </div>
+    <form id="upload-form" style="margin-bottom: 20px;">
+      <input type="file" name="file" class="form-input" required />
+      <button type="submit" class="btn-primary" style="margin-top: 10px;">Upload</button>
+    </form>
+
+    <div id="link-container" style="display: none;">
+      <video id="video-preview" controls style="width: 100%; max-height: 300px; margin-bottom: 10px; display: none;"></video>
+      <input type="text" id="file-url" class="form-input" readonly />
+      <button onclick="copyLink()" class="btn-secondary" style="margin-top: 10px;">Copy Link</button>
     </div>
   </div>
 
@@ -707,16 +702,23 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(form);
-      const res = await fetch('/upload', {
+
+      const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData
       });
+
+      if (!res.ok) {
+        alert('Upload failed');
+        return;
+      }
+
       const data = await res.json();
-      const fullUrl = window.location.origin + data.url;
+      const fullUrl = data.url;
       fileUrlInput.value = fullUrl;
       linkContainer.style.display = 'block';
 
-      if (data.url.endsWith('.mp4') || data.url.endsWith('.webm')) {
+      if (fullUrl.endsWith('.mp4') || fullUrl.endsWith('.webm')) {
         videoPreview.src = fullUrl;
         videoPreview.style.display = 'block';
       } else {
