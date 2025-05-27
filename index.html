@@ -827,9 +827,9 @@
         </div>
     </div>
 
-    <!-- 1-Hour File Host (Uguu version) -->
+    <!-- 1-Hour Upload via transfer.sh -->
     <div class="app-card p-4 rounded-xl bg-[#111] text-white border border-[#333]">
-      <h2 class="text-lg font-mono mb-2">UPLOAD FILE (Expires in 24h)</h2>
+      <h2 class="text-lg font-mono mb-2">UPLOAD FILE (Expires in 1 Day)</h2>
       <input id="emberFileInput" type="file" class="file:bg-[#222] file:text-white file:border file:border-[#444] file:rounded px-2 py-1 mb-3 w-full font-mono" />
       <p id="emberFileStatus" class="text-sm text-green-400 font-mono"></p>
     </div>
@@ -843,28 +843,31 @@
         if (!file) return;
     
         const formData = new FormData();
-        formData.append("files[]", file);
+        formData.append("file", file);
     
-        emberStatus.textContent = "Uploading to uguu.se...";
+        emberStatus.textContent = "Uploading to transfer.sh...";
     
         try {
-          const res = await fetch("https://uguu.se/upload.php", {
-            method: "POST",
-            body: formData
+          const res = await fetch(`https://transfer.sh/${encodeURIComponent(file.name)}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": file.type
+            },
+            body: file
           });
     
-          const data = await res.json();
-          if (data.files && data.files[0] && data.files[0].url) {
-            const url = data.files[0].url;
+          if (res.ok) {
+            const url = await res.text();
             emberStatus.innerHTML = `✔ Uploaded: <a href="${url}" target="_blank" class="underline text-blue-400">${url}</a>`;
           } else {
-            emberStatus.textContent = "❌ Upload failed. Try again.";
+            emberStatus.textContent = "❌ Upload failed.";
           }
         } catch (err) {
-          emberStatus.textContent = "⚠ An error occurred.";
+          emberStatus.textContent = "⚠ Error occurred.";
         }
       });
     </script>
+
 
     <script>
 const BIN_ID = '6832d5068561e97a501b3c2b';
