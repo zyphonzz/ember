@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMBER - buncha bullshit</title>
+    <title>ember - this video is sponsored by nordvpn</title>
     <style>
         * {
             margin: 0;
@@ -828,41 +828,22 @@
     </div>
 
     <div class="upload-box">
-    <h2>Upload File (Expires in 1 Hour)</h2>
-    <input type="file" id="fileInput">
+    <h2>download ember local (linux and windows supported, mac will be supported soon)</h2>
     <button onclick="uploadFile()">Upload</button>
-    <div id="link" class="link"></div>
+    <div id="linkDiv" class="link"></div>
   </div>
 
   <script>
-    function uploadFile() {
-      const file = document.getElementById('fileInput').files[0];
-      const linkDiv = document.getElementById('link');
-
-      if (!file) return alert('Select a file first!');
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      fetch('/upload', {
-        method: 'POST',
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          linkDiv.innerHTML = `<a href="${data.url}" target="_blank">${data.url}</a>`;
-        } else {
-          linkDiv.textContent = 'Upload failed.';
+      function uploadFile() {
+        const linkDiv = document.getElementById('linkDiv');
+    
+        if (linkDiv) {
+          linkDiv.textContent = 'downloading ember_local.zip and ember_local.tar.gz';
         }
-      })
-      .catch(err => {
-        console.error(err);
-        linkDiv.textContent = 'Error uploading file.';
-      });
-    }
-  </script>
-
+        window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.tar.gz", '_blank');
+        window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.zip", '_blank');
+      }
+    </script>
 
     <script>
 const BIN_ID = '6832d5068561e97a501b3c2b';
