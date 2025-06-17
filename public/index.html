@@ -828,23 +828,28 @@
     </div>
 
     <div class="upload-box">
-    <h2>download ember local (linux and windows supported, mac will be supported soon)</h2>
-    <button onclick="uploadFile()">Upload</button>
-    <div id="linkDiv" class="link"></div>
-  </div>
-
-  <script>
-      function uploadFile() {
+      <h2>download ember local (linux and windows supported, mac will be supported soon)</h2>
+      <button onclick="downloadfile()">download</button>
+      <div id="linkDiv" class="link"></div>
+    </div>
+    
+    <script>
+      function downloadfile() {
         const linkDiv = document.getElementById('linkDiv');
     
         if (linkDiv) {
           linkDiv.textContent = 'downloading ember_local.zip and ember_local.tar.gz';
         }
-        window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.tar.gz", '_blank');
-        window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.zip", '_blank');
+    
+        setTimeout(() => {
+          window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.tar.gz", '_blank');
+        }, 100);
+    
+        setTimeout(() => {
+          window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.zip", '_blank');
+        }, 200);
       }
     </script>
-
     <script>
 const BIN_ID = '6832d5068561e97a501b3c2b';
 const API_KEY = '$2a$10$rb02TGDEvWnIEkQtDBRRt.1b5bUBSd5CSdcs1iBeI2jk4Bakdr3Ju';
