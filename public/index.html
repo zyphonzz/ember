@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ember - this video is sponsored by nordvpn</title>
+    <title>EMBER Terminal - v0.1 indev</title>
     <style>
         * {
             margin: 0;
@@ -11,624 +11,249 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Courier New', monospace;
-            background-color: #0a0a0a;
-            color: #cccccc;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+        html, body {
             height: 100%;
-            background-color: #0a0a0a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-        
-        #loading-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        .loading-text {
-            color: #ccc;
-            font-family: 'Courier New', monospace;
-            font-size: 2rem;
-            letter-spacing: 3px;
-            text-shadow: 0 0 10px #ccc, 0 0 20px #ccc;
-            animation: pulseGlow 2s infinite;
-        }
-        
-        @keyframes pulseGlow {
-            0%, 100% {
-                text-shadow: 0 0 10px #ccc, 0 0 20px #ccc;
-            }
-            50% {
-                text-shadow: 0 0 15px #fff, 0 0 30px #fff;
-            }
-        }
-        
-        .dots::after {
-            content: '';
-            display: inline-block;
-            animation: dotPulse 1.2s steps(4, end) infinite;
-        }
-        
-        @keyframes dotPulse {
-            0% { content: ''; }
-            25% { content: '.'; }
-            50% { content: '..'; }
-            75% { content: '...'; }
-            100% { content: ''; }
+            overflow-x: hidden;
+            font-family: "Courier New", monospace;
+            background-color: #000000;
+            color: #00ff00;
         }
 
+        .min-h-screen {
+            min-height: 100vh;
+        }
+
+        .bg-black {
+            background-color: #000000;
+        }
+
+        .text-green-400 {
+            color: #4ade80;
+        }
+
+        .text-blue-400 {
+            color: #60a5fa;
+        }
+
+        .text-yellow-400 {
+            color: #facc15;
+        }
+
+        .text-red-400 {
+            color: #f87171;
+        }
+
+        .text-gray-300 {
+            color: #d1d5db;
+        }
+
+        .text-gray-400 {
+            color: #9ca3af;
+        }
+
+        .text-white {
+            color: #ffffff;
+        }
+
+        .text-gray-100 {
+            color: #f3f4f6;
+        }
+
+        .font-mono {
+            font-family: "Courier New", monospace;
+        }
 
         .container {
-            display: grid;
-            grid-template-areas: 
-                "header header"
-                "sidebar main";
-            grid-template-rows: auto 1fr;
-            grid-template-columns: 280px 1fr;
-            min-height: 100vh;
-            gap: 1px;
-            background-color: #333;
+            max-width: 1152px;
+            margin: 0 auto;
+            padding: 1rem;
         }
 
-        .header {
-            grid-area: header;
-            background-color: #0a0a0a;
-            padding: 20px;
-            border-bottom: 2px solid #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-left h1 {
-            font-size: 2.5rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-            color: #ffffff;
-        }
-
-        .version {
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        .header-right {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .dev-login-btn {
-            background-color: #1a1a1a;
-            border: 2px solid #888;
-            color: #888;
-            padding: 8px 16px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .dev-login-btn:hover {
-            background-color: #888;
-            color: #0a0a0a;
-            box-shadow: 0 0 10px rgba(136, 136, 136, 0.5);
-        }
-
-        .sidebar {
-            grid-area: sidebar;
-            background-color: #0a0a0a;
-            padding: 20px;
-            border-right: 2px solid #333;
+        .overflow-y-auto {
             overflow-y: auto;
         }
 
-        .filter-section {
-            margin-bottom: 30px;
-        }
-
-        .filter-input {
-            width: 100%;
-            background-color: #1a1a1a;
-            border: 2px solid #333;
-            color: #cccccc;
-            padding: 10px;
-            font-family: inherit;
-            font-size: 1rem;
-            margin-bottom: 20px;
-        }
-
-        .filter-input:focus {
-            outline: none;
-            border-color: #cccccc;
-            box-shadow: 0 0 10px rgba(204, 204, 204, 0.3);
-        }
-
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 10px;
-        }
-
-        .filter-btn {
-            background-color: #1a1a1a;
-            border: 2px solid #333;
-            color: #cccccc;
-            padding: 8px 12px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .text-center {
             text-align: center;
         }
 
-        .filter-btn:hover {
-            border-color: #cccccc;
-            box-shadow: 0 0 10px rgba(204, 204, 204, 0.3);
-            background-color: #2a2a2a;
+        .py-8 {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
 
-        .filter-btn.active {
-            background-color: #cccccc;
-            color: #0a0a0a;
+        .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.75rem;
         }
 
-        .main-content {
-            grid-area: main;
-            background-color: #0a0a0a;
-            padding: 20px;
-            overflow-y: auto;
+        .mb-4 {
+            margin-bottom: 1rem;
         }
 
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+        .mb-1 {
+            margin-bottom: 0.25rem;
         }
 
-        .app-card {
-            background-color: #1a1a1a;
-            border: 2px solid #333;
-            padding: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            display: flex;             /* <- NEW */
-            flex-direction: column;    /* <- NEW */
-        }
-
-        .app-card:hover {
-            border-color: #cccccc;
-            box-shadow: 0 0 20px rgba(204, 204, 204, 0.2);
-        }
-
-        .app-title {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #cccccc;
-            padding-bottom: 5px;
-            color: #ffffff;
-        }
-
-        .app-description {
-            color: #aaa;
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-
-        .app-rating {
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #cccccc;
-        }
-
-        .app-price {
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            color: #cccccc;
-        }
-
-        .app-tags {
+        .flex {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
         }
 
-        .tag {
-            background-color: #333;
-            border: 1px solid #555;
-            padding: 4px 8px;
-            font-size: 0.8rem;
-            color: #ccc;
-            border-radius: 3px;
-        }
-
-        /* Grayscale tag variations */
-        .tag.tv { background-color: #666; color: white; border-color: #666; }
-        .tag.free { background-color: #888; color: #0a0a0a; border-color: #888; }
-        .tag.premium { background-color: #555; color: white; border-color: #555; }
-        .tag.hacking { background-color: #444; color: white; border-color: #444; }
-        .tag.security { background-color: #777; color: white; border-color: #777; }
-        .tag.networking { background-color: #999; color: #0a0a0a; border-color: #999; }
-        .tag.ai { background-color: #aaa; color: #0a0a0a; border-color: #aaa; }
-        .tag.python { background-color: #bbb; color: #0a0a0a; border-color: #bbb; }
-        .tag.javascript { background-color: #ccc; color: #0a0a0a; border-color: #ccc; }
-        .tag.linux { background-color: #ddd; color: #0a0a0a; border-color: #ddd; }
-        .tag.windows { background-color: #eee; color: #0a0a0a; border-color: #eee; }
-        .tag.mobile { background-color: #222; color: white; border-color: #222; }
-        .tag.web { background-color: #111; color: white; border-color: #111; }
-        .tag.gaming { background-color: #555; color: white; border-color: #555; }
-
-        .app-actions {
-            margin-top: auto; /* <- pushes it to bottom of the flex container */
-            padding-top: 15px;
-            border-top: 1px solid #333;
-        }
-
-        .app-link-btn {
-            background-color: #333;
-            border: 2px solid #666;
-            color: #cccccc;
-            padding: 8px 16px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .app-link-btn:hover:not(:disabled) {
-            background-color: #666;
-            border-color: #888;
-            box-shadow: 0 0 10px rgba(136, 136, 136, 0.3);
-        }
-
-        .app-link-btn:disabled {
-            background-color: #1a1a1a;
-            border-color: #333;
-            color: #555;
-            cursor: not-allowed;
-        }
-
-        .search-results {
-            margin-bottom: 20px;
-            color: #666;
-        }
-
-        /* Dev Panel Styles */
-        .dev-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            display: none;
-            overflow-y: auto;
-        }
-
-        .dev-panel.active {
-            display: block;
-        }
-
-        .dev-panel-content {
-            max-width: 800px;
-            margin: 50px auto;
-            background-color: #1a1a1a;
-            border: 2px solid #888;
-            padding: 30px;
-        }
-
-        .dev-panel-header {
-            display: flex;
-            justify-content: space-between;
+        .items-center {
             align-items: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #888;
-            padding-bottom: 15px;
         }
 
-        .dev-panel-title {
-            color: #888;
-            font-size: 1.8rem;
-            font-weight: bold;
+        .gap-2 {
+            gap: 0.5rem;
         }
 
-        .close-btn {
-            background-color: #666;
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            font-family: inherit;
+        .ml-0 {
+            margin-left: 0;
+        }
+
+        .flex-1 {
+            flex: 1 1 0%;
+        }
+
+        .bg-transparent {
+            background-color: transparent;
+        }
+
+        .outline-none {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+        }
+
+        .caret-green-400 {
+            caret-color: #4ade80;
+        }
+
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+
+        .space-y-1 > * + * {
+            margin-top: 0.25rem;
+        }
+
+        .space-y-3 > * + * {
+            margin-top: 0.75rem;
+        }
+
+        .ml-4 {
+            margin-left: 1rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .border-l-2 {
+            border-left-width: 2px;
+        }
+
+        .border-blue-400 {
+            border-color: #60a5fa;
+        }
+
+        .pl-3 {
+            padding-left: 0.75rem;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+            line-height: 1rem;
+        }
+
+        .bg-gray-700 {
+            background-color: #374151;
+        }
+
+        .px-2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .rounded {
+            border-radius: 0.25rem;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .mr-8 {
+            margin-right: 2rem;
+        }
+
+        .underline {
+            text-decoration-line: underline;
+        }
+
+        .cursor-pointer {
             cursor: pointer;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .animate-ping {
+            animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes ping {
+            75%, 100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        input {
+            border: none;
+            color: #4ade80;
+            font-family: "Courier New", monospace;
             font-size: 1rem;
         }
 
-        .close-btn:hover {
-            background-color: #444;
-        }
-
-        .dev-section {
-            margin-bottom: 30px;
-            border: 1px solid #333;
-            padding: 20px;
-        }
-
-        .dev-section-title {
-            color: #cccccc;
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-label {
-            display: block;
-            color: #ccc;
-            margin-bottom: 5px;
-        }
-
-        .form-input, .form-textarea, .form-select {
-            width: 100%;
-            background-color: #0a0a0a;
-            border: 2px solid #333;
-            color: #cccccc;
-            padding: 10px;
-            font-family: inherit;
-            font-size: 1rem;
-        }
-
-        .form-textarea {
-            height: 80px;
-            resize: vertical;
-        }
-
-        .form-input:focus, .form-textarea:focus, .form-select:focus {
+        input:focus {
             outline: none;
-            border-color: #cccccc;
-            box-shadow: 0 0 10px rgba(204, 204, 204, 0.3);
         }
 
-        .btn-primary {
-            background-color: #cccccc;
-            border: none;
-            color: #0a0a0a;
-            padding: 12px 24px;
-            font-family: inherit;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn-primary:hover {
-            background-color: #aaa;
-        }
-
-        .btn-secondary {
-            background-color: #333;
-            border: 2px solid #666;
-            color: #ccc;
-            padding: 10px 20px;
-            font-family: inherit;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-
-        .btn-secondary:hover {
-            background-color: #555;
-        }
-
-        .tag-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .tag-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #ccc;
-        }
-
-        .tag-checkbox input[type="checkbox"] {
-            accent-color: #cccccc;
-        }
-
-        .login-form {
-            max-width: 400px;
-            margin: 100px auto;
-            background-color: #1a1a1a;
-            border: 2px solid #888;
-            padding: 30px;
-        }
-
-        .login-title {
-            color: #888;
-            font-size: 1.5rem;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .error-message {
-            color: #999;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-
-        .success-message {
-            color: #cccccc;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
-
-        .status-message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #1a1a1a;
-            border: 2px solid #888;
-            color: #cccccc;
-            padding: 10px 20px;
-            z-index: 1001;
-            display: none;
-        }
-
-        .status-message.show {
-            display: block;
-        }
-
-        /* Hamburger menu (hidden on desktop) */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: #ccc;
-            font-size: 2rem;
-            margin-left: 10px;
-            cursor: pointer;
-            z-index: 1002;
-        }
-
-        /* Sidebar drawer on mobile */
-        .sidebar {
-            transition: transform 0.3s ease;
-        }
-        .sidebar.mobile-hidden {
-            transform: translateX(-110%);
-            position: fixed;
-            left: 0; top: 0; bottom: 0;
-            width: 80vw;
-            max-width: 320px;
-            z-index: 1100;
-            background: #0a0a0a;
-            box-shadow: 2px 0 12px rgba(0,0,0,0.6);
-        }
-        .sidebar.mobile-visible {
-            transform: translateX(0);
-            position: fixed;
-            left: 0; top: 0; bottom: 0;
-            width: 80vw;
-            max-width: 320px;
-            z-index: 1100;
-            background: #0a0a0a;
-            box-shadow: 2px 0 12px rgba(0,0,0,0.6);
-        }
-        .sidebar-backdrop {
-            display: none;
-        }
-        .sidebar-backdrop.active {
-            display: block;
-            position: fixed;
-            z-index: 1099;
-            left: 0; top: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                grid-template-areas: 
-                    "header"
-                    "main";
-                grid-template-columns: 1fr;
-                grid-template-rows: auto 1fr;
-            }
-            .sidebar {
-                border-right: none;
-                border-bottom: 2px solid #333;
-                position: fixed;
-                left: 0; top: 0; bottom: 0;
-                width: 80vw;
-                max-width: 320px;
-                height: 100vh;
-                overflow-y: auto;
-                background: #0a0a0a;
-                transform: translateX(-110%);
-                transition: transform 0.3s ease;
-                z-index: 1100;
-                box-shadow: 2px 0 12px rgba(0,0,0,0.6);
-            }
-            .sidebar.mobile-visible {
-                transform: translateX(0);
-            }
-            .mobile-menu-btn {
-                display: inline-block;
-            }
-            .header {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                gap: 0;
-            }
-            .header-left {
-                flex: 1 1 auto;
-            }
-            .main-content {
-                padding: 10px;
-            }
-            .content-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-            .dev-panel-content, .login-form {
-                margin: 10px;
-                padding: 10px;
-            }
-            .app-card {
-                padding: 12px;
-            }
-            .filter-section {
-                margin-bottom: 12px;
-            }
-            .filter-input {
-                font-size: 1rem;
-                padding: 8px;
-            }
-            .filter-grid {
-                gap: 6px;
-            }
-            .btn-primary, .btn-secondary {
-                padding: 9px 16px;
-                font-size: 0.95rem;
-            }
-            .app-link-btn {
-                font-size: 1rem;
-                padding: 9px 12px;
-            }
-        }
-
-        /* Touch-friendly enhancements */
-        .app-link-btn, .filter-btn, .dev-login-btn, .btn-primary, .btn-secondary {
-            min-height: 44px;
-            min-width: 44px;
-        }
-        input, button, textarea {
-            font-size: 1rem;
+        ::selection {
+            background-color: #4ade80;
+            color: #000000;
         }
 
         ::-webkit-scrollbar {
@@ -647,470 +272,631 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
-        .app-card {
-            background-color: #1a1a1a;
-            border: 2px solid #444;
-            transition: transform 0.2s ease;
-        }
-        
-        .app-card:hover {
-            transform: translateY(-2px);
-        }
-        /* === Rounded Corners Enhancements === */
-        .app-card,
-        .app-link-btn,
-        .filter-btn,
-        .filter-input,
-        .dev-login-btn,
-        .form-input,
-        .form-textarea,
-        .form-select,
-        .btn-primary,
-        .btn-secondary,
-        .tag,
-        .dev-panel-content,
-        .login-form,
-        .close-btn,
-        .status-message {
-            border-radius: 6px;
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            .container {
+                padding: 0.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- LOADING SCREEN -->
-    <div id="loading-screen">
-        <div class="loading-text">EMBER LOADING<span class="dots">...</span></div>
-    </div>
-    <div class="container">
-        <header class="header">
-            <div class="header-left">
-                <h1>EMBER</h1>
-                <div class="version">v0.1 indev</div>
-            </div>
-            <div class="header-right">
-                <button class="dev-login-btn" onclick="showDevLogin()">DEV PANEL</button>
-            </div>
-        </header>
-
-        <aside class="sidebar">
-            <div class="filter-section">
-                <input type="text" class="filter-input" placeholder="Filter . . ." />
-                
-                <div class="filter-grid" id="filter-grid">
-                    <button class="filter-btn" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="util">Util</button>
-                    <button class="filter-btn" data-filter="hacking">H3cks</button>
-                    <button class="filter-btn active" data-filter="tv">TV</button>
-                    <button class="filter-btn" data-filter="scripts">Scripts</button>
-                    <button class="filter-btn" data-filter="ai">AI</button>
-                    <button class="filter-btn" data-filter="clients">Clients</button>
-                    <button class="filter-btn" data-filter="python">Python</button>
-                    <button class="filter-btn" data-filter="open-source">Open Source</button>
-                    <button class="filter-btn" data-filter="irc">IRC</button>
-                    <button class="filter-btn" data-filter="os-tweaking">OS Tweaking</button>
-                    <button class="filter-btn" data-filter="free">Free</button>
-                    <button class="filter-btn" data-filter="security">Security</button>
-                    <button class="filter-btn" data-filter="networking">Networking</button>
-                    <button class="filter-btn" data-filter="gaming">Gaming</button>
-                    <button class="filter-btn" data-filter="irc">IRC</button>
+    <div class="min-h-screen bg-black text-green-400 font-mono">
+        <div class="container">
+            <div id="terminal" class="min-h-screen overflow-y-auto">
+                <!-- Loading indicator -->
+                <div id="loading" class="text-center py-8">
+                    <div class="text-green-400 text-xl animate-pulse">
+                        EMBER LOADING<span class="animate-ping">...</span>
+                    </div>
                 </div>
-            </div>
-        </aside>
 
-        <main class="main-content">
-            <div class="search-results">Showing <span id="result-count">0</span> results</div>
-            
-            <div class="content-grid" id="content-grid">
-                <!-- Content will be populated by JavaScript -->
-            </div>
-        </main>
-    </div>
+                <!-- Command history will be inserted here -->
+                <div id="history"></div>
 
-    <!-- Status Message -->
-    <div class="status-message" id="status-message"></div>
-
-    <!-- Dev Panel -->
-    <div class="dev-panel" id="dev-panel">
-        <div class="dev-panel-content">
-            <div class="dev-panel-header">
-                <div class="dev-panel-title">DEVELOPER PANEL</div>
-                <button class="close-btn" onclick="closeDevPanel()">CLOSE</button>
-            </div>
-
-            <div class="dev-section">
-                <div class="dev-section-title">ADD NEW APPLICATION</div>
-                <form id="add-app-form">
-                    <div class="form-group">
-                        <label class="form-label">Application Name</label>
-                        <input type="text" class="form-input" id="app-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-textarea" id="app-description" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Rating (0-10)</label>
-                        <input type="number" class="form-input" id="app-rating" min="0" max="10" step="0.1" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Price</label>
-                        <input type="text" class="form-input" id="app-price" placeholder="$0.00" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Link URL (optional)</label>
-                        <input type="url" class="form-input" id="app-link" placeholder="https://example.com">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tags</label>
-                        <div class="tag-selector">
-                            <div class="tag-checkbox"><input type="checkbox" value="tv"> TV</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="free"> Free</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="premium"> Premium</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="hacking"> Hacking</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="security"> Security</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="networking"> Networking</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="ai"> AI</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="python"> Python</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="javascript"> JavaScript</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="linux"> Linux</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="windows"> Windows</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="mobile"> Mobile</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="web"> Web</div>
-                            <div class="tag-checkbox"><input type="checkbox" value="gaming"> Gaming</div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-primary">ADD APPLICATION</button>
+                <!-- Current input -->
+                <form id="input-form" class="flex items-center gap-2">
+                    <span class="text-green-400">[ember@terminal]</span>
+                    <span class="text-blue-400">~/store</span>
+                    <span class="text-white">$</span>
+                    <input 
+                        id="command-input"
+                        type="text"
+                        class="flex-1 bg-transparent outline-none text-green-400 caret-green-400"
+                        autofocus
+                        spellcheck="false"
+                        placeholder="Type command..."
+                    />
                 </form>
             </div>
-
-            <div class="dev-section">
-                <div class="dev-section-title">MANAGE CATEGORIES</div>
-                <div class="form-group">
-                    <label class="form-label">Add New Category</label>
-                    <input type="text" class="form-input" id="new-category" placeholder="Category name">
-                    <button type="button" class="btn-secondary" onclick="addCategory()">ADD CATEGORY</button>
-                </div>
-            </div>
-
-            <div class="dev-section">
-                <div class="dev-section-title">BULK OPERATIONS</div>
-                <button type="button" class="btn-secondary" onclick="exportData()">EXPORT DATA</button>
-                <button type="button" class="btn-secondary" onclick="clearAllData()">CLEAR ALL DATA</button>
-                <button type="button" class="btn-secondary" onclick="loadSampleData()">LOAD SAMPLE DATA</button>
-                <div style="margin-top: 15px; color: #888; font-size: 0.9rem;">
-                    Total Applications: <span id="app-count">0</span>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Login Form -->
-    <div class="dev-panel" id="login-panel">
-        <div class="login-form">
-            <div class="login-title">DEV ACCESS</div>
-            <form id="login-form">
-                <div class="form-group">
-                    <label class="form-label">Username</label>
-                    <input type="text" class="form-input" id="username" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-input" id="password" required>
-                </div>
-                <button type="submit" class="btn-primary">LOGIN</button>
-                <button type="button" class="btn-secondary" onclick="closeLoginPanel()">CANCEL</button>
-                <div id="login-message"></div>
-            </form>
-        </div>
-    </div>
-
-    <div class="upload-box">
-      <h2>download ember local (linux and windows supported, mac will be supported soon)</h2>
-      <button onclick="downloadfile()">download</button>
-      <div id="linkDiv" class="link"></div>
-    </div>
-    
     <script>
-      function downloadfile() {
-        const linkDiv = document.getElementById('linkDiv');
-    
-        if (linkDiv) {
-          linkDiv.textContent = 'downloading ember_local.zip and ember_local.tar.gz';
+        // Constants
+        const BIN_ID = "6832d5068561e97a501b3c2b";
+        const API_KEY = "$2a$10$hqlbz8FagW8YWBkeXVLhouovoqwqV4alPw/1i2Ty7Pf8YD..HJtlK";
+        const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+        const DEV_CREDENTIALS = { username: "zyphonz", password: "Cookie113!" };
+
+        // State variables
+        let input = "";
+        let history = [];
+        let commandHistory = [];
+        let historyIndex = -1;
+        let applications = [];
+        let categories = [];
+        let isDevLoggedIn = false;
+        let isLoading = true;
+        let addingApp = false;
+        let newAppData = {};
+        let addingStep = 0;
+
+        // DOM elements
+        const terminal = document.getElementById('terminal');
+        const historyDiv = document.getElementById('history');
+        const inputForm = document.getElementById('input-form');
+        const commandInput = document.getElementById('command-input');
+        const loadingDiv = document.getElementById('loading');
+
+        // Fetch data from JSONBin
+        async function fetchData() {
+            try {
+                const response = await fetch(JSONBIN_URL, {
+                    headers: {
+                        "X-Master-Key": API_KEY,
+                    },
+                });
+                const data = await response.json();
+                applications = data.record.applications || [];
+                categories = data.record.categories || [];
+                isLoading = false;
+                loadingDiv.style.display = 'none';
+            } catch (err) {
+                console.error("Failed to fetch data:", err);
+                addOutput("", createErrorElement("Error loading data from server"));
+                isLoading = false;
+                loadingDiv.style.display = 'none';
+            }
         }
-    
-        setTimeout(() => {
-          window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.tar.gz", '_blank');
-        }, 100);
-    
-        setTimeout(() => {
-          window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.zip", '_blank');
-        }, 200);
-      }
-    </script>
-    <script>
-const BIN_ID = '6832d5068561e97a501b3c2b';
-const API_KEY = '$2a$10$hqlbz8FagW8YWBkeXVLhouovoqwqV4alPw/1i2Ty7Pf8YD..HJtlK';
-const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-// Local cache
-let applications = [];
-let categories = [];
-let isDevLoggedIn = false;
+        // Save data to JSONBin
+        async function saveData() {
+            const data = { applications, categories };
+            try {
+                await fetch(JSONBIN_URL, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": API_KEY,
+                    },
+                    body: JSON.stringify(data),
+                });
+                return true;
+            } catch (err) {
+                console.error("Failed to save data:", err);
+                return false;
+            }
+        }
 
-const DEV_CREDENTIALS = { username: "zyphonz", password: "Cookie113!" };
+        // Helper functions to create elements
+        function createElement(tag, className = '', content = '') {
+            const element = document.createElement(tag);
+            if (className) element.className = className;
+            if (content) element.textContent = content;
+            return element;
+        }
 
-// Initialize app
-document.addEventListener('DOMContentLoaded', () => {
-    fetchData();
-    setupEventListeners();
-});
+        function createErrorElement(text) {
+            return createElement('div', 'text-red-400', text);
+        }
 
-// Fetch from JSONBin
-async function fetchData() {
-    try {
-        const response = await fetch(JSONBIN_URL, {
-            headers: {
-                'X-Master-Key': API_KEY
+        function createSuccessElement(text) {
+            return createElement('div', 'text-green-400', text);
+        }
+
+        // Add output to terminal
+        function addOutput(command, output) {
+            const newEntry = {
+                command,
+                output,
+                timestamp: new Date(),
+            };
+            history.push(newEntry);
+            renderHistory();
+            scrollToBottom();
+        }
+
+        // Render command history
+        function renderHistory() {
+            historyDiv.innerHTML = '';
+            
+            history.forEach((entry, index) => {
+                const entryDiv = createElement('div', 'mb-4');
+                
+                if (entry.command) {
+                    const commandDiv = createElement('div', 'flex items-center gap-2 mb-1');
+                    commandDiv.innerHTML = `
+                        <span class="text-green-400">[ember@terminal]</span>
+                        <span class="text-blue-400">~/store</span>
+                        <span class="text-white">$</span>
+                        <span class="text-gray-300">${entry.command}</span>
+                    `;
+                    entryDiv.appendChild(commandDiv);
+                }
+                
+                const outputDiv = createElement('div', 'text-gray-100 ml-0');
+                if (typeof entry.output === 'string') {
+                    outputDiv.textContent = entry.output;
+                } else {
+                    outputDiv.appendChild(entry.output);
+                }
+                entryDiv.appendChild(outputDiv);
+                
+                historyDiv.appendChild(entryDiv);
+            });
+        }
+
+        // Scroll to bottom
+        function scrollToBottom() {
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Command implementations
+        const commands = {
+            help: () => {
+                const div = createElement('div', 'space-y-2');
+                div.innerHTML = `
+                    <div class="text-green-400">EMBER v0.1 indev - Available Commands:</div>
+                    <div class="ml-4 space-y-1 text-sm">
+                        <div><span class="text-blue-400">list</span> or <span class="text-blue-400">ls</span> - Show all applications</div>
+                        <div><span class="text-blue-400">filter &lt;category&gt;</span> - Filter apps by category</div>
+                        <div><span class="text-blue-400">search &lt;query&gt;</span> - Search applications</div>
+                        <div><span class="text-blue-400">show &lt;app_name&gt;</span> - Show detailed app info</div>
+                        <div><span class="text-blue-400">open &lt;app_name&gt;</span> - Open application link</div>
+                        <div><span class="text-blue-400">categories</span> - List all categories</div>
+                        <div><span class="text-blue-400">stats</span> - Show database statistics</div>
+                        <div><span class="text-blue-400">download</span> - Download EMBER local files</div>
+                        <div class="text-yellow-400 mt-2">Developer Commands:</div>
+                        <div><span class="text-blue-400">dev login</span> - Access developer panel</div>
+                        <div><span class="text-blue-400">dev add</span> - Add new application (requires login)</div>
+                        <div><span class="text-blue-400">dev export</span> - Export all data (requires login)</div>
+                        <div><span class="text-blue-400">dev clear</span> - Clear all data (requires login)</div>
+                        <div><span class="text-blue-400">dev logout</span> - Logout from developer panel</div>
+                        <div class="text-gray-400 mt-2">System Commands:</div>
+                        <div><span class="text-blue-400">clear</span> - Clear terminal</div>
+                        <div><span class="text-blue-400">neofetch</span> - Show system info</div>
+                    </div>
+                `;
+                return div;
+            },
+
+            list: () => renderApplicationList(applications),
+            ls: () => renderApplicationList(applications),
+
+            categories: () => {
+                const div = createElement('div', 'space-y-2');
+                const title = createElement('div', 'text-green-400', `Available Categories (${categories.length}):`);
+                const grid = createElement('div', 'ml-4 grid grid-cols-4 gap-2');
+                
+                categories.forEach(cat => {
+                    const catDiv = createElement('div', 'text-blue-400', cat);
+                    grid.appendChild(catDiv);
+                });
+                
+                div.appendChild(title);
+                div.appendChild(grid);
+                return div;
+            },
+
+            stats: () => {
+                const div = createElement('div', 'space-y-2');
+                const freeApps = applications.filter(app => app.tags.includes("free")).length;
+                const premiumApps = applications.filter(app => app.tags.includes("premium")).length;
+                const avgRating = applications.length > 0 
+                    ? (applications.reduce((sum, app) => sum + app.rating, 0) / applications.length).toFixed(1)
+                    : 0;
+                
+                div.innerHTML = `
+                    <div class="text-green-400">EMBER Database Statistics:</div>
+                    <div class="ml-4 space-y-1">
+                        <div>Total Applications: <span class="text-yellow-400">${applications.length}</span></div>
+                        <div>Categories: <span class="text-yellow-400">${categories.length}</span></div>
+                        <div>Free Apps: <span class="text-yellow-400">${freeApps}</span></div>
+                        <div>Premium Apps: <span class="text-yellow-400">${premiumApps}</span></div>
+                        <div>Average Rating: <span class="text-yellow-400">${avgRating}/10</span></div>
+                    </div>
+                `;
+                return div;
+            },
+
+            download: () => {
+                const div = createElement('div', 'space-y-2');
+                div.innerHTML = `
+                    <div class="text-green-400">EMBER Local Download:</div>
+                    <div class="ml-4 space-y-1">
+                        <div>Downloading ember_local.zip and ember_local.tar.gz...</div>
+                        <div class="text-blue-400 underline cursor-pointer" onclick="downloadFiles()">
+                            📦 Click here if download doesn't start automatically
+                        </div>
+                        <div class="text-gray-400 text-sm">Supports: Linux, Windows (Mac coming soon)</div>
+                    </div>
+                `;
+                // Auto-trigger download
+                setTimeout(downloadFiles, 100);
+                return div;
+            },
+
+            neofetch: () => {
+                const div = createElement('div', 'space-y-1 font-mono text-sm');
+                div.innerHTML = `
+                    <div class="flex">
+                        <div class="text-green-400 mr-8">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;███████<br>
+                            &nbsp;&nbsp;&nbsp;███████████<br>
+                            &nbsp;&nbsp;█████████████<br>
+                            &nbsp;&nbsp;█████████████<br>
+                            &nbsp;&nbsp;█████████████<br>
+                            &nbsp;&nbsp;&nbsp;███████████<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;███████
+                        </div>
+                        <div class="space-y-1">
+                            <div><span class="text-blue-400">OS:</span> EMBER Terminal</div>
+                            <div><span class="text-blue-400">Version:</span> v0.1 indev</div>
+                            <div><span class="text-blue-400">Shell:</span> ember-cli</div>
+                            <div><span class="text-blue-400">Apps:</span> ${applications.length} installed</div>
+                            <div><span class="text-blue-400">Categories:</span> ${categories.length} available</div>
+                            <div><span class="text-blue-400">Status:</span> ${isDevLoggedIn ? "Developer Mode" : "User Mode"}</div>
+                            <div><span class="text-blue-400">Memory:</span> Coffee/Coffee</div>
+                        </div>
+                    </div>
+                `;
+                return div;
+            },
+
+            clear: () => null,
+        };
+
+        // Download files function
+        function downloadFiles() {
+            window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.tar.gz", "_blank");
+            setTimeout(() => {
+                window.open("https://github.com/zyphonzz/ember/raw/refs/heads/main/ember_local.zip", "_blank");
+            }, 200);
+        }
+
+        // Render application list
+        function renderApplicationList(apps) {
+            const div = createElement('div', 'space-y-3');
+            const title = createElement('div', 'text-green-400', `Applications (${apps.length} found):`);
+            div.appendChild(title);
+
+            if (apps.length === 0) {
+                const noApps = createElement('div', 'text-gray-400 ml-4', 'No applications found');
+                div.appendChild(noApps);
+            } else {
+                const appsDiv = createElement('div', 'space-y-2');
+                apps.forEach(app => {
+                    const appDiv = createElement('div', 'ml-4 border-l-2 border-blue-400 pl-3');
+                    
+                    const headerDiv = createElement('div', 'flex items-center gap-2');
+                    headerDiv.innerHTML = `
+                        <span class="text-blue-400 font-bold">${app.name}</span>
+                        <span class="text-yellow-400">★${app.rating}/10</span>
+                        <span class="text-green-400">${app.price}</span>
+                    `;
+                    
+                    const descDiv = createElement('div', 'text-gray-300 text-sm', app.description);
+                    
+                    const tagsDiv = createElement('div', 'flex gap-1 mt-1');
+                    app.tags.forEach(tag => {
+                        const tagSpan = createElement('span', 'text-xs bg-gray-700 px-2 py-1 rounded text-gray-300', tag.toUpperCase());
+                        tagsDiv.appendChild(tagSpan);
+                    });
+                    
+                    appDiv.appendChild(headerDiv);
+                    appDiv.appendChild(descDiv);
+                    appDiv.appendChild(tagsDiv);
+                    appsDiv.appendChild(appDiv);
+                });
+                div.appendChild(appsDiv);
+            }
+            return div;
+        }
+
+        // Execute command
+        async function executeCommand(cmd) {
+            const parts = cmd.trim().split(" ");
+            const command = parts[0].toLowerCase();
+            const args = parts.slice(1);
+
+            if (command === "clear") {
+                history = [];
+                renderHistory();
+                return;
+            }
+
+            // Handle adding app flow
+            if (addingApp) {
+                await handleAddAppInput(cmd.trim());
+                return;
+            }
+
+            // Basic commands
+            if (commands[command]) {
+                const output = commands[command]();
+                if (output !== null) {
+                    addOutput(cmd, output);
+                }
+                return;
+            }
+
+            // Filter command
+            if (command === "filter" && args.length > 0) {
+                const category = args[0].toLowerCase();
+                const filtered = applications.filter(
+                    app => app.tags.includes(category) || app.name.toLowerCase().includes(category)
+                );
+                addOutput(cmd, renderApplicationList(filtered));
+                return;
+            }
+
+            // Search command
+            if (command === "search" && args.length > 0) {
+                const query = args.join(" ").toLowerCase();
+                const filtered = applications.filter(
+                    app =>
+                        app.name.toLowerCase().includes(query) ||
+                        app.description.toLowerCase().includes(query) ||
+                        app.tags.some(tag => tag.toLowerCase().includes(query))
+                );
+                addOutput(cmd, renderApplicationList(filtered));
+                return;
+            }
+
+            // Show command
+            if (command === "show" && args.length > 0) {
+                const appName = args.join(" ").toLowerCase();
+                const app = applications.find(a => a.name.toLowerCase().includes(appName));
+                if (app) {
+                    const div = createElement('div', 'space-y-2');
+                    div.innerHTML = `
+                        <div class="text-green-400">Application Details:</div>
+                        <div class="ml-4 space-y-1">
+                            <div><span class="text-blue-400">Name:</span> ${app.name}</div>
+                            <div><span class="text-blue-400">Description:</span> ${app.description}</div>
+                            <div><span class="text-blue-400">Rating:</span> ★${app.rating}/10</div>
+                            <div><span class="text-blue-400">Price:</span> ${app.price}</div>
+                            <div><span class="text-blue-400">Link:</span> ${app.link || "No link available"}</div>
+                            <div><span class="text-blue-400">Tags:</span> ${app.tags.join(", ")}</div>
+                        </div>
+                    `;
+                    addOutput(cmd, div);
+                } else {
+                    addOutput(cmd, createErrorElement(`Application not found: ${args.join(" ")}`));
+                }
+                return;
+            }
+
+            // Open command
+            if (command === "open" && args.length > 0) {
+                const appName = args.join(" ").toLowerCase();
+                const app = applications.find(a => a.name.toLowerCase().includes(appName));
+                if (app && app.link) {
+                    window.open(app.link, "_blank", "noopener,noreferrer");
+                    addOutput(cmd, createSuccessElement(`Opening ${app.name}...`));
+                } else if (app) {
+                    addOutput(cmd, createErrorElement(`No link available for ${app.name}`));
+                } else {
+                    addOutput(cmd, createErrorElement(`Application not found: ${args.join(" ")}`));
+                }
+                return;
+            }
+
+            // Dev commands
+            if (command === "dev") {
+                if (args[0] === "login") {
+                    const div = createElement('div', 'space-y-2');
+                    div.innerHTML = `
+                        <div class="text-yellow-400">Developer Authentication Required</div>
+                        <div class="text-gray-300">Enter credentials (username password):</div>
+                    `;
+                    addOutput(cmd, div);
+                    addingApp = true;
+                    addingStep = -1;
+                    return;
+                }
+
+                if (!isDevLoggedIn) {
+                    addOutput(cmd, createErrorElement("Access denied. Use 'dev login' first."));
+                    return;
+                }
+
+                if (args[0] === "add") {
+                    addOutput(cmd, createSuccessElement("Starting application creation wizard..."));
+                    addingApp = true;
+                    addingStep = 0;
+                    newAppData = {};
+                    addOutput("", createElement('div', 'text-blue-400', 'Enter application name:'));
+                    return;
+                }
+
+                if (args[0] === "logout") {
+                    isDevLoggedIn = false;
+                    addOutput(cmd, createSuccessElement("Logged out from developer panel"));
+                    return;
+                }
+
+                if (args[0] === "export") {
+                    const dataStr = JSON.stringify({ applications, categories }, null, 2);
+                    const blob = new Blob([dataStr], { type: "application/json" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "ember-data.json";
+                    a.click();
+                    addOutput(cmd, createSuccessElement("Data exported to ember-data.json"));
+                    return;
+                }
+
+                if (args[0] === "clear") {
+                    applications = [];
+                    categories = [];
+                    await saveData();
+                    addOutput(cmd, createElement('div', 'text-yellow-400', 'All data cleared from database'));
+                    return;
+                }
+            }
+
+            // Unknown command
+            addOutput(cmd, createErrorElement(`Command not found: ${cmd}. Type 'help' for available commands.`));
+        }
+
+        // Handle app input during creation
+        async function handleAddAppInput(input) {
+            // Handle login
+            if (addingStep === -1) {
+                const [username, password] = input.split(" ");
+                if (username === DEV_CREDENTIALS.username && password === DEV_CREDENTIALS.password) {
+                    isDevLoggedIn = true;
+                    addingApp = false;
+                    addOutput("", createSuccessElement("Developer login successful!"));
+                } else {
+                    addingApp = false;
+                    addOutput("", createErrorElement("Invalid credentials"));
+                }
+                return;
+            }
+
+            // Handle app creation steps
+            const steps = [
+                { field: "name", prompt: "Enter application description:" },
+                { field: "description", prompt: "Enter rating (0-10):" },
+                { field: "rating", prompt: "Enter price (e.g., $0.00):" },
+                { field: "price", prompt: "Enter link URL (optional, press enter to skip):" },
+                { field: "link", prompt: "Enter tags (comma-separated):" },
+                { field: "tags", prompt: null },
+            ];
+
+            const currentStep = steps[addingStep];
+
+            if (currentStep.field === "rating") {
+                const rating = parseFloat(input);
+                if (isNaN(rating) || rating < 0 || rating > 10) {
+                    addOutput("", createErrorElement("Invalid rating. Please enter a number between 0 and 10:"));
+                    return;
+                }
+                newAppData[currentStep.field] = rating;
+            } else if (currentStep.field === "tags") {
+                const tags = input
+                    .split(",")
+                    .map(tag => tag.trim().toLowerCase())
+                    .filter(tag => tag);
+                newAppData[currentStep.field] = tags;
+            } else {
+                newAppData[currentStep.field] = input || undefined;
+            }
+
+            addingStep++;
+
+            if (addingStep < steps.length) {
+                const nextStep = steps[addingStep];
+                if (nextStep.prompt) {
+                    addOutput("", createElement('div', 'text-blue-400', nextStep.prompt));
+                }
+            } else {
+                // Create the app
+                const newApp = {
+                    id: Date.now(),
+                    name: newAppData.name || "",
+                    description: newAppData.description || "",
+                    rating: newAppData.rating || 0,
+                    price: newAppData.price || "$0.00",
+                    link: newAppData.link,
+                    tags: newAppData.tags || [],
+                };
+
+                applications.push(newApp);
+                const saved = await saveData();
+
+                addingApp = false;
+                newAppData = {};
+                addingStep = 0;
+
+                if (saved) {
+                    addOutput("", createSuccessElement(`Application '${newApp.name}' added successfully!`));
+                } else {
+                    addOutput("", createErrorElement("Failed to save application to database"));
+                }
+            }
+        }
+
+        // Event listeners
+        inputForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cmd = commandInput.value.trim();
+            if (cmd) {
+                commandHistory.push(cmd);
+                historyIndex = -1;
+                executeCommand(cmd);
+                commandInput.value = "";
+                commandInput.placeholder = addingApp ? "Enter response..." : "Type command...";
             }
         });
 
-        const data = await response.json();
-        applications = data.record.applications || [];
-        categories = data.record.categories || [];
-        
-        renderApplications();
-        renderCategories();
-        updateAppCount();
-    } catch (err) {
-        console.error("Failed to fetch data:", err);
-        showStatusMessage('Error loading data.');
-    }
-}
-
-// Save to JSONBin
-async function saveData() {
-    const data = {
-        applications,
-        categories
-    };
-
-    try {
-        await fetch(JSONBIN_URL, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': API_KEY
-            },
-            body: JSON.stringify(data)
+        commandInput.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowUp") {
+                e.preventDefault();
+                if (commandHistory.length > 0) {
+                    const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
+                    historyIndex = newIndex;
+                    commandInput.value = commandHistory[newIndex];
+                }
+            } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (historyIndex !== -1) {
+                    const newIndex = historyIndex + 1;
+                    if (newIndex >= commandHistory.length) {
+                        historyIndex = -1;
+                        commandInput.value = "";
+                    } else {
+                        historyIndex = newIndex;
+                        commandInput.value = commandHistory[newIndex];
+                    }
+                }
+            }
         });
 
-        showStatusMessage('Data saved globally!');
-    } catch (err) {
-        console.error("Failed to save data:", err);
-        showStatusMessage('Error saving data.');
-    }
-}
+        // Click to focus terminal
+        terminal.addEventListener('click', () => {
+            commandInput.focus();
+        });
 
-function showStatusMessage(message) {
-    const statusEl = document.getElementById('status-message');
-    statusEl.textContent = message;
-    statusEl.classList.add('show');
-    setTimeout(() => {
-        statusEl.classList.remove('show');
-    }, 3000);
-}
-
-function updateAppCount() {
-    const countEl = document.getElementById('app-count');
-    if (countEl) countEl.textContent = applications.length;
-}
-
-function setupEventListeners() {
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('filter-btn')) {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            filterApplications(e.target.dataset.filter);
+        // Initialize
+        async function init() {
+            // Welcome message
+            const welcomeDiv = createElement('div', 'space-y-2');
+            welcomeDiv.innerHTML = `
+                <div class="text-green-400 font-bold text-lg">EMBER v0.1 indev - Application Store Terminal</div>
+                <div class="text-blue-400">Loading applications from database...</div>
+                <div class="text-gray-300">Type 'help' to see available commands.</div>
+                <div class="text-gray-400 text-sm">Use arrow keys to navigate command history.</div>
+            `;
+            
+            addOutput("", welcomeDiv);
+            
+            await fetchData();
+            
+            if (!isLoading && applications.length > 0) {
+                addOutput("", createSuccessElement(`Database loaded: ${applications.length} applications, ${categories.length} categories`));
+            }
         }
-    });
 
-    document.querySelector('.filter-input').addEventListener('input', function() {
-        searchApplications(this.value);
-    });
-
-    document.getElementById('add-app-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        addApplication();
-    });
-
-    document.getElementById('login-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleLogin();
-    });
-}
-
-function renderApplications(apps = applications) {
-    const grid = document.getElementById('content-grid');
-    const resultCount = document.getElementById('result-count');
-    
-    grid.innerHTML = '';
-    resultCount.textContent = apps.length;
-
-    apps.forEach(app => {
-        const card = document.createElement('div');
-        card.className = 'app-card';
-        card.innerHTML = `
-            <div class="app-title">${app.name}</div>
-            <div class="app-description">${app.description}</div>
-            <div class="app-rating">Rating: ${app.rating}/10</div>
-            <div class="app-price">Price: ${app.price}</div>
-            <div class="app-tags">
-                ${app.tags.map(tag => `<span class="tag ${tag}">${tag.toUpperCase()}</span>`).join('')}
-            </div>
-            <div class="app-actions">
-                <button class="app-link-btn" onclick="openAppLink('${app.link || '#'}', '${app.name}')" ${!app.link ? 'disabled' : ''}>
-                    ${app.link ? 'VISIT SITE' : 'NO LINK'}
-                </button>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-function renderCategories() {
-    const filterGrid = document.getElementById('filter-grid');
-    filterGrid.innerHTML = '';
-
-    categories.forEach(category => {
-        const btn = document.createElement('button');
-        btn.className = 'filter-btn';
-        btn.dataset.filter = category;
-        btn.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
- 
-        if (category === 'tv') btn.classList.add('active');
-
-        filterGrid.appendChild(btn);
-    });
-}
-
-function filterApplications(filter) {
-    if (filter === 'all') {
-        renderApplications();
-        return;
-    }
-
-    const filtered = applications.filter(app =>
-        app.tags.includes(filter) ||
-        app.name.toLowerCase().includes(filter.toLowerCase())
-    );
-    renderApplications(filtered);
-}
-
-function searchApplications(query) {
-    if (!query.trim()) {
-        renderApplications();
-        return;
-    }
-
-    const filtered = applications.filter(app =>
-        app.name.toLowerCase().includes(query.toLowerCase()) ||
-        app.description.toLowerCase().includes(query.toLowerCase()) ||
-        app.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
-    );
-    renderApplications(filtered);
-}
-
-function addApplication() {
-    const name = document.getElementById('app-name').value;
-    const description = document.getElementById('app-description').value;
-    const rating = parseFloat(document.getElementById('app-rating').value);
-    const price = document.getElementById('app-price').value;
-    const link = document.getElementById('app-link').value;
-
-    const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox input:checked'))
-        .map(checkbox => checkbox.value);
-
-    const newApp = {
-        id: Date.now(),
-        name,
-        description,
-        rating,
-        price,
-        link: link || null,
-        tags: selectedTags
-    };
-
-    applications.push(newApp);
-    saveData();
-    renderApplications();
-    updateAppCount();
-
-    document.getElementById('add-app-form').reset();
-    document.querySelectorAll('.tag-checkbox input').forEach(cb => cb.checked = false);
-}
-
-function showDevLogin() {
-    const loginPanel = document.getElementById('login-panel');
-    if (loginPanel) {
-        loginPanel.classList.add('active');
-    } else {
-        console.warn("Login panel not found!");
-    }
-}
-
-
-function handleLogin() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const messageEl = document.getElementById('login-message');
-
-    if (username === DEV_CREDENTIALS.username && password === DEV_CREDENTIALS.password) {
-        isDevLoggedIn = true;
-        messageEl.innerHTML = '<div class="success-message">Login successful!</div>';
-        setTimeout(() => {
-            closeLoginPanel();
-            showDevPanel();
-        }, 1000);
-    } else {
-        messageEl.innerHTML = '<div class="error-message">Invalid credentials!</div>';
-    }
-}
-
-function showDevPanel() {
-    document.getElementById('dev-panel').classList.add('active');
-    updateAppCount();
-}
-
-function closeLoginPanel() {
-    document.getElementById('login-panel').classList.remove('active');
-}
-
-function openAppLink(url, appName) {
-    if (url && url !== '#') {
-        window.open(url, '_blank', 'noopener,noreferrer');
-        showStatusMessage(`Opening ${appName}...`);
-    }
-}
-        // Wait for apps to render then hide loader
-        function waitForAppsToRender() {
-            const grid = document.getElementById('content-grid');
-            const loader = document.getElementById('loading-screen');
-        
-            const observer = new MutationObserver(() => {
-                if (grid.children.length > 0) {
-                    setTimeout(() => {
-                        loader.classList.add('hidden');
-                    }, 500); // small delay for smoother transition
-                    observer.disconnect();
-                }
-            });
-        
-            observer.observe(grid, { childList: true });
-        }
-        
-        waitForAppsToRender();
-
-</script>
-
+        // Start the application
+        init();
+    </script>
 </body>
 </html>
