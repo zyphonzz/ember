@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMBER (v1.0 beta) - i put the new forgis on the jeep</title>
+    <title>EMBER (v1.0 beta) - App Store</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -577,6 +577,7 @@
                 showPrices: true,
             },
             isDevLoggedIn: false,
+            showDevLogin: false,
             devUsername: 'lunaz',
             devPassword: 'letmein121211',
             consoleLogs: [],
@@ -587,14 +588,16 @@
                     settings: { ...state.settings, ...newSettings },
                 })),
             setDevLoggedIn: (status) => set({ isDevLoggedIn: status }),
+            setShowDevLogin: (val) => set({ showDevLogin: val }),
             addConsoleLog: (log) =>
                 set((state) => ({
                     consoleLogs: [...state.consoleLogs, log].slice(-100),
                 })),
         }));
 
+        // NOTE: replace these with your own secure storage or environment vars. Do NOT commit secrets to public repos.
         const BIN_ID = '6832d5068561e97a501b3c2b';
-        const API_KEY = '$2a$10$hqlbz8FagW8YWBkeXVLhouovoqwqV4alPw/1i2Ty7Pf8YD..HJtlK';
+        const API_KEY = '$REPLACE_WITH_YOUR_KEY';
         const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
         function replaceBranding(text) {
@@ -610,7 +613,7 @@
                 name: replaceBranding(app.name),
                 description: replaceBranding(app.description),
                 link: app.link ? replaceBranding(app.link) : app.link,
-                tags: app.tags.map((tag) => replaceBranding(tag)),
+                tags: (app.tags || []).map((tag) => replaceBranding(tag)),
             };
         }
 
@@ -623,25 +626,41 @@
                 });
 
                 const data = await response.json();
+                const record = data && data.record ? data.record : {};
                 return {
-                    applications: (data.record.applications || []).map(processApplication),
-                    categories: (data.record.categories || []).map(replaceBranding),
+                    applications: (record.applications || []).map(processApplication),
+                    categories: (record.categories || []).map(replaceBranding),
                 };
             } catch (error) {
                 console.error('Failed to fetch data:', error);
-                return { applications: [], categories: [] };
+                // fallback sample data so UI still works locally
+                return {
+                    applications: [
+                        {
+                            name: 'Sample App',
+                            description: 'This is a fallback sample app.',
+                            link: '#',
+                            price: 'Free',
+                            rating: 4.5,
+                            tags: ['sample', 'demo'],
+                            category: 'Utilities',
+                        },
+                    ],
+                    categories: ['Utilities'],
+                };
             }
         }
 
         async function saveApplications(applications, categories) {
             try {
+                // JSONBin v3 expects the data under a `record` key.
                 const response = await fetch(JSONBIN_URL, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Master-Key': API_KEY,
                     },
-                    body: JSON.stringify({ applications, categories }),
+                    body: JSON.stringify({ record: { applications, categories } }),
                 });
 
                 if (!response.ok) throw new Error('Failed to save');
@@ -660,14 +679,23 @@
                 if (!canvas) return;
 
                 const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+
+                function resize() {
+                    const dpr = window.devicePixelRatio || 1;
+                    canvas.width = Math.floor(window.innerWidth * dpr);
+                    canvas.height = Math.floor(window.innerHeight * dpr);
+                    canvas.style.width = window.innerWidth + 'px';
+                    canvas.style.height = window.innerHeight + 'px';
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                }
+
+                resize();
 
                 const stars = [];
                 for (let i = 0; i < 100; i++) {
                     stars.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
+                        x: Math.random() * window.innerWidth,
+                        y: Math.random() * window.innerHeight,
                         radius: Math.random() * 1.5,
                         opacity: Math.random() * 0.5 + 0.3,
                         twinkleSpeed: Math.random() * 0.02 + 0.01,
@@ -678,12 +706,13 @@
                 let time = 0;
 
                 const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.fillStyle = 'rgba(10, 10, 10, 0.1)';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                     stars.forEach((star) => {
                         const opacity = star.opacity + Math.sin(time * star.twinkleSpeed) * 0.3;
-                        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, opacity)})`;
+                        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, Math.min(1, opacity))})`;
                         ctx.beginPath();
                         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
                         ctx.fill();
@@ -695,16 +724,11 @@
 
                 animate();
 
-                const handleResize = () => {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-                };
-
-                window.addEventListener('resize', handleResize);
+                window.addEventListener('resize', resize);
 
                 return () => {
                     cancelAnimationFrame(animationId);
-                    window.removeEventListener('resize', handleResize);
+                    window.removeEventListener('resize', resize);
                 };
             }, []);
 
@@ -712,9 +736,10 @@
         }
 
         function DevConsole({ isOpen, onClose }) {
-            const { consoleLogs, addConsoleLog } = useStore();
-            const [input, setInput] = useState('');
+            const consoleLogs = useStore((s) => s.consoleLogs);
+            const addConsoleLog = useStore((s) => s.addConsoleLog);
             const outputRef = useRef(null);
+            const [input, setInput] = useState('');
 
             useEffect(() => {
                 if (outputRef.current) {
@@ -724,6 +749,7 @@
 
             const handleCommand = (e) => {
                 if (e.key === 'Enter' && input.trim()) {
+                    e.preventDefault();
                     const cmd = input.trim();
                     addConsoleLog({ type: 'command', text: `> ${cmd}` });
 
@@ -742,6 +768,7 @@
                             window.location.reload();
                         } else {
                             try {
+                                // eslint-disable-next-line no-eval
                                 const result = eval(cmd);
                                 addConsoleLog({ type: 'success', text: String(result) });
                             } catch (err) {
@@ -776,7 +803,7 @@
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            onKeyPress={handleCommand}
+                            onKeyDown={handleCommand}
                             placeholder="Type command..."
                         />
                     </div>
@@ -785,9 +812,18 @@
         }
 
         function DevPanel() {
-            const store = useStore();
-            const { isDevLoggedIn, setDevLoggedIn, devUsername, devPassword, applications, categories, setApplications, setCategories, addConsoleLog } = store;
-            const [showLogin, setShowLogin] = useState(true);
+            const isDevLoggedIn = useStore((s) => s.isDevLoggedIn);
+            const setDevLoggedIn = useStore((s) => s.setDevLoggedIn);
+            const devUsername = useStore((s) => s.devUsername);
+            const devPassword = useStore((s) => s.devPassword);
+            const applications = useStore((s) => s.applications);
+            const categories = useStore((s) => s.categories);
+            const setApplications = useStore((s) => s.setApplications);
+            const setCategories = useStore((s) => s.setCategories);
+            const addConsoleLog = useStore((s) => s.addConsoleLog);
+            const showDevLogin = useStore((s) => s.showDevLogin);
+            const setShowDevLogin = useStore((s) => s.setShowDevLogin);
+
             const [username, setUsername] = useState('');
             const [password, setPassword] = useState('');
             const [showConsole, setShowConsole] = useState(false);
@@ -806,14 +842,14 @@
                 e.preventDefault();
                 if (username === devUsername && password === devPassword) {
                     setDevLoggedIn(true);
-                    setShowLogin(false);
+                    setShowDevLogin(false);
                     setUsername('');
                     setPassword('');
                     addConsoleLog({ type: 'success', text: 'Developer mode activated' });
                 } else {
                     addConsoleLog({ type: 'error', text: 'Invalid username or password' });
                 }
-            }, [username, password, devUsername, devPassword, setDevLoggedIn, addConsoleLog]);
+            }, [username, password, devUsername, devPassword, setDevLoggedIn, setShowDevLogin, addConsoleLog]);
 
             const handleAddApp = useCallback(async () => {
                 if (!formData.name || !formData.description) {
@@ -858,8 +894,8 @@
                         </button>
                     )}
 
-                    {showLogin && !isDevLoggedIn && (
-                        <div className="modal-overlay" onClick={(e) => e.stopPropagation()}>
+                    {showDevLogin && !isDevLoggedIn && (
+                        <div className="modal-overlay" onClick={() => setShowDevLogin(false)}>
                             <div className="modal" onClick={(e) => e.stopPropagation()}>
                                 <h2 className="modal-title">Developer Login</h2>
                                 <form onSubmit={handleLogin}>
@@ -989,7 +1025,13 @@
         }
 
         function App() {
-            const { applications, categories, settings, updateSettings } = useStore();
+            const applications = useStore((s) => s.applications);
+            const categories = useStore((s) => s.categories);
+            const settings = useStore((s) => s.settings);
+            const updateSettings = useStore((s) => s.updateSettings);
+            const setApplications = useStore((s) => s.setApplications);
+            const setCategories = useStore((s) => s.setCategories);
+
             const [filteredApps, setFilteredApps] = useState([]);
             const [selectedCategory, setSelectedCategory] = useState('All');
             const [searchQuery, setSearchQuery] = useState('');
@@ -997,12 +1039,13 @@
 
             useEffect(() => {
                 fetchApplications().then(({ applications, categories }) => {
-                    useStore.setState({ applications, categories });
+                    setApplications(applications);
+                    setCategories(categories);
                 });
-            }, []);
+            }, [setApplications, setCategories]);
 
             useEffect(() => {
-                let filtered = applications;
+                let filtered = applications || [];
 
                 if (selectedCategory !== 'All') {
                     filtered = filtered.filter((app) => app.category === selectedCategory);
@@ -1011,8 +1054,8 @@
                 if (searchQuery) {
                     filtered = filtered.filter(
                         (app) =>
-                            app.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            app.description.toLowerCase().includes(searchQuery.toLowerCase())
+                            (app.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (app.description || '').toLowerCase().includes(searchQuery.toLowerCase())
                     );
                 }
 
@@ -1022,11 +1065,15 @@
             useEffect(() => {
                 const root = document.documentElement;
                 root.style.setProperty('--accent-color', settings.accentColor);
-                const rgb = parseInt(settings.accentColor.slice(1), 16);
-                const r = (rgb >> 16) & 255;
-                const g = (rgb >> 8) & 255;
-                const b = rgb & 255;
-                root.style.setProperty('--accent-rgb', `${r}, ${g}, ${b}`);
+                try {
+                    const rgb = parseInt(settings.accentColor.slice(1), 16);
+                    const r = (rgb >> 16) & 255;
+                    const g = (rgb >> 8) & 255;
+                    const b = rgb & 255;
+                    root.style.setProperty('--accent-rgb', `${r}, ${g}, ${b}`);
+                } catch (err) {
+                    // ignore if color parsing fails
+                }
             }, [settings.accentColor]);
 
             return (
@@ -1045,6 +1092,9 @@
                                 <div className="header-buttons">
                                     <button className="btn btn-secondary" onClick={() => setShowSettings(!showSettings)}>
                                         ⚙️ Settings
+                                    </button>
+                                    <button className="btn btn-secondary" onClick={() => useStore.getState().setShowDevLogin(true)}>
+                                        👨‍💻 Developer
                                     </button>
                                 </div>
                             </div>
@@ -1092,13 +1142,11 @@
                                                     {settings.showPrices && <span className="app-price">{app.price}</span>}
                                                 </div>
                                                 <div className="app-tags">
-                                                    {app.tags.map((tag, i) => (
-                                                        <span key={i} className="tag">
-                                                            {tag}
-                                                        </span>
+                                                    { (app.tags || []).map((tag, i) => (
+                                                        <span key={i} className="tag">{tag}</span>
                                                     ))}
                                                 </div>
-                                                <a href={app.link} target="_blank" rel="noopener noreferrer" className="app-link">
+                                                <a href={app.link || '#'} target="_blank" rel="noopener noreferrer" className="app-link">
                                                     Download
                                                 </a>
                                             </div>
